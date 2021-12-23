@@ -6,6 +6,7 @@ import UpdateForm from "../updateForm/updateForm";
 import ListForm from "../listForm/listForm";
 import GetForm from "../getForm/getForm";
 import { Component } from "react";
+import PredictForm from "../predictForm/predictForm";
 
 class HomePage extends Component {
   constructor(props) {
@@ -86,10 +87,17 @@ class HomePage extends Component {
           >
             Get
           </Button>
-          {/* <Button variant="contained" className="container-btn">
-            Delete
+          <Button variant="contained"  className={
+              this.state.chosenForm === "predict"
+                ? "container-btn container-btn--selected"
+                : "container-btn"
+            }
+            onClick={() => {
+              this.setState({ chosenForm: "predict" });
+            }}>
+            Predict
           </Button>
-          <Button variant="contained" className="container-btn">
+          {/*<Button variant="contained" className="container-btn">
             Update
           </Button>
           <Button variant="contained" className="container-btn">
@@ -107,16 +115,19 @@ class HomePage extends Component {
     let form = null;
     switch (this.state.chosenForm) {
       case "create":
-        form = <CreateForm key="Create"/>;
+        form = <CreateForm key="Create" />;
         break;
       case "update":
-        form = <UpdateForm key="Update"/>;
+        form = <UpdateForm key="Update" />;
         break;
       case "list":
-        form = <ListForm key="List"/>;
+        form = <ListForm key="List" />;
         break;
       case "get":
-        form = <GetForm key="Get"/>;
+        form = <GetForm key="Get" />;
+        break;
+        case "predict":
+        form = <PredictForm key="Get" />;
         break;
       default:
         form = "";

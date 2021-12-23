@@ -1,4 +1,5 @@
 import json
+import pandas as pd
 from tempfile import NamedTemporaryFile
 
 from flask import Flask
@@ -22,10 +23,8 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 def list_deployments():
     try:
         result = plugin.list_deployments()
-        print("Result is: ", result)
     except Exception as err:
         result = str(err)
-        print("Exception: ", result)
     return json.dumps(result)
 
 
@@ -33,13 +32,10 @@ def list_deployments():
 def get_deployments(name):
     try:
         result = plugin.get_deployment(name)
-        print("Result is: ", result)
         deploy = json.loads(result["deploy"])
-        print("<<<<<<<<<<<<< Deploy: ", deploy)
     except Exception as err:
-        result = str(err)
-        print("Exception: ", result)
-    return deploy
+        deploy = str(err)
+    return json.dumps(deploy)
 
 
 @app.route('/create', methods=["POST"])
@@ -53,9 +49,6 @@ def create_mt_deployment():
     # h_file = NamedTemporaryFile()
     # h_file.write(handler_file.read())
     data = request.get_json()
-    print("\n\n\n\n\n")
-    print(data)
-    print("\n\n\n\n\n")
     config = {
         "MODEL_FILE": data.get("model_file"),
         "HANDLER": data.get("handler_file"),
@@ -68,10 +61,16 @@ def create_mt_deployment():
         config=config,
     )
 
-    print("<<<<<<<<<<<<<<<<<<<<<<< Result: ", result)
-
     return result
 
+
+@app.route('/predict', methods=["POST"])
+def predict():
+    data = request.get_json()
+    input_path = data["model_inputPath"]
+    df = pd.read_json(input_path)
+    result = plugin.predict(deployment_name=data["model_name"], df=df)
+    return json.dumps(result)
 
 if __name__ == '__main__':
     app.run(debug=True)
