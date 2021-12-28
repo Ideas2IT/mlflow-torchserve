@@ -1,76 +1,218 @@
-import React, { FC } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { createStyles, makeStyles } from '@mui/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import CreateDialogComponent from "../create/create-dialog-popup";
+import { Backdrop, Button, Chip, CircularProgress } from "@mui/material";
+import { getListService } from "../../services/api-service";
+import EditDialogComponent from "../edit/edit-dialog-popup";
 
 // constants
 
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
-    root: {
-      flex: 1,
-      display: "flex",
-      flexDirection: "column",
+    dashboardCntr: {
+      width: "100%",
+      margin: "0 auto",
     },
-    button: {
-        backgroundColor: "red !important",
-        width: '10px'
+    dashboardTable: {
+      margin: "0 auto",
+      padding: "80px",
+    },
+    tableHeader: {
+      border: "2px solid black",
+      display: "flex",
+      padding: "15px",
+      marginTop: "20px"
+    },
+    tableBody: {
+      border: "1px solid grey",
+      borderBottom: 0,
+      height: "288px",
+      overflowY: "scroll",
+    },
+    tableBodyRow: {
+      display: "flex",
+      padding: "10px 15px",
+      borderBottom: "1px solid",
+    },
+    tableHeaderContent: {
+      fontWeight: "bold",
+      marginRight: "30px",
+    },
+    tableBodyContent: {
+      marginRight: "30px",
+    },
+    tableHeaderContent__name: {
+      width: "15%",
+    },
+    tableHeaderContent__scripts: {
+      width: "30%",
+    },
+    tableHeaderContent__status: {
+      width: "10%",
+    },
+    tableBodyContent__name: {
+      fontWeight: "bold",
+      textDecoration: "underline",
+      width: "15%",
+    },
+    tableBodyContent__scripts: {
+      width: "30%",
+    },
+    tableBodyContent__status: {
+      width: "10%",
     }
   })
 );
 
-function createData(name: string, calories: any, fat: any, carbs: any, protein: any) {
-    return { name, calories, fat, carbs, protein };
-  }
-  
-  const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-  ];
-  
+export interface DialogComponentProps {
+  open: boolean,
+  modelName?: string,
+  onCancelPressed?: () => void
+}
 
 const Dashboard: FC<any> = () => {
     const classes = useStyles();
+
+    const createDefaultDlgProps: DialogComponentProps = {
+      open: false,
+      onCancelPressed: () => {
+        setCreateDlgProps(createDefaultDlgProps);
+      },
+    }
+    const [createDlgProps, setCreateDlgProps] = useState<DialogComponentProps>(createDefaultDlgProps);
+    const handleCreateClick = () => {
+      setCreateDlgProps((prev: any) => ({
+        ...prev,
+        open: true
+      }))
+    };
+
+    const editDefaultDlgProps: DialogComponentProps = {
+      open: false,
+      modelName: '',
+      onCancelPressed: () => {
+        setEditDlgProps(editDefaultDlgProps);
+      },
+    }
+    const [editDlgProps, setEditDlgProps] = useState<DialogComponentProps>(editDefaultDlgProps);
+    const handleEditClick = (modelName: string) => {
+      setEditDlgProps((prev: any) => ({
+        ...prev,
+        open: true,
+        modelName
+      }))
+    };
+
+    const [loading, setloader] = useState(true);
+    const [models, setModels] = useState<any>([]);
+    useEffect(() => {
+      getListService()
+        .then((res) => res.json())
+        .then(
+          (result) => {
+            setModels(result.items);
+            setloader(false);
+          },
+          (error) => {
+            setModels([
+              { modelName: "squeezenet1_1", modelUrl: "squeezenet1_1.mar" },
+              { modelName: "squeezenet2_1", modelUrl: "squeezenet2_1.mar" },
+              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+            ]);
+            setloader(false);
+          }
+        );
+    }, []);
+
     return (
-        // <></>
-        <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Dessert (100g serving)</TableCell>
-              <TableCell align="right">Calories</TableCell>
-              <TableCell align="right">Fat&nbsp;(g)</TableCell>
-              <TableCell align="right">Carbs&nbsp;(g)</TableCell>
-              <TableCell align="right">Protein&nbsp;(g)</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                key={row.name}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell align="right">{row.calories}</TableCell>
-                <TableCell align="right">{row.fat}</TableCell>
-                <TableCell align="right">{row.carbs}</TableCell>
-                <TableCell align="right">{row.protein}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        <>
+          <CreateDialogComponent {...createDlgProps} />
+          <EditDialogComponent {...editDlgProps} />
+          <div className={classes.dashboardCntr}>
+            <div className={classes.dashboardTable}>
+            <div style={{textAlign: "right"}}>
+              <Button variant="contained" onClick={handleCreateClick}>New</Button>
+            </div>
+              {!loading ? (
+                <>
+                  <div className={classes.tableHeader}>
+                    <div
+                      className={[
+                        classes.tableHeaderContent,
+                        classes.tableHeaderContent__name,
+                      ].join(" ")}
+                    >
+                      Model Name
+                    </div>
+                    <div
+                      className={[
+                        classes.tableHeaderContent,
+                        classes.tableHeaderContent__scripts,
+                      ].join(" ")}
+                    >
+                      Scripts
+                    </div>
+                    <div
+                      className={[
+                        classes.tableHeaderContent,
+                        classes.tableHeaderContent__status,
+                      ].join(" ")}
+                    >
+                      Status
+                    </div>
+                  </div>
+                  <div className={classes.tableBody}>
+                    {models.map((model: any, index: number) => (
+                      <div key={index} className={classes.tableBodyRow}>
+                        <div
+                          className={[
+                            classes.tableBodyContent,
+                            classes.tableBodyContent__name,
+                          ].join(" ")}
+                        >
+                          {model.modelName}
+                        </div>
+                        <div
+                          className={[
+                            classes.tableBodyContent,
+                            classes.tableBodyContent__scripts,
+                          ].join(" ")}
+                        >
+                          <Chip label="Chip Filled" />
+                        </div>
+                        <div
+                          className={[
+                            classes.tableBodyContent,
+                            classes.tableBodyContent__status,
+                          ].join(" ")}
+                        >
+                          Running
+                        </div>
+                        <div>
+                          <Button variant="contained">Predict</Button>
+                          <Button variant="contained">Explain</Button>
+                          <Button variant="contained" onClick={() => handleEditClick(model.modelName)}>Edit</Button>
+                          <Button variant="contained">Delete</Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <Backdrop
+                  sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+                  open={loading}
+                >
+                  <CircularProgress color="inherit" />
+                </Backdrop>
+              )}
+            </div>
+          </div>
+        </>
     );
   };
 

@@ -1,7 +1,6 @@
-import React, { FC } from "react";
-import Button from '@mui/material/Button';
-import { createStyles, makeStyles } from '@mui/styles';
-
+import React, { FC, useState } from "react";
+import Button from "@mui/material/Button";
+import { createStyles, makeStyles, StylesProvider } from "@mui/styles";
 
 // components
 import Header from "../header/header";
@@ -17,24 +16,33 @@ const useStyles = makeStyles((theme: any) =>
       flexDirection: "column",
     },
     button: {
-        backgroundColor: "red !important",
-        width: '10px'
-    }
+      backgroundColor: "red !important",
+      width: "10px",
+    },
   })
 );
-  
-const Layout: FC<any> = () => {
-    const classes = useStyles();
-    return (
-        <>
-            <div>
-                <Header />
-            </div>
-            <div>
-                <Dashboard />
-            </div>
-        </>
-    );
-  };
 
-  export default Layout;
+const Layout: FC<any> = () => {
+  const classes = useStyles();
+  const [showDashborad, setshowDashboard] = useState(false);
+  const setStatus = (status: boolean) => {
+    setshowDashboard(status)
+  }
+  return (
+    <StylesProvider>
+      <div>
+        <Header setStatus={setStatus}/>
+      </div>
+      {showDashborad ? (
+        <div>
+          <Dashboard />
+        </div>
+      ) : (
+        ""
+      )}
+      <></>
+    </StylesProvider>
+  );
+};
+
+export default Layout;
