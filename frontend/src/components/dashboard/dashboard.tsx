@@ -4,6 +4,7 @@ import CreateDialogComponent from "../create/create-dialog-popup";
 import { Backdrop, Button, Chip, CircularProgress } from "@mui/material";
 import { getListService } from "../../services/api-service";
 import EditDialogComponent from "../edit/edit-dialog-popup";
+import PredictDialogComponent from "../predict/predict-dialog-popup";
 
 // constants
 
@@ -68,7 +69,7 @@ const useStyles = makeStyles((theme: any) =>
 export interface DialogComponentProps {
   open: boolean,
   modelName?: string,
-  onCancelPressed?: () => void
+  onCancelPressed?: () => void,
 }
 
 const Dashboard: FC<any> = () => {
@@ -104,6 +105,22 @@ const Dashboard: FC<any> = () => {
       }))
     };
 
+    const preditDefaultDlgProps: DialogComponentProps = {
+      open: false,
+      modelName: '',
+      onCancelPressed: () => {
+        setEditDlgProps(preditDefaultDlgProps);
+      }
+    }
+    const [predictDlgProps, setPredictDlgProps] = useState<DialogComponentProps>(preditDefaultDlgProps);
+    const handlePreditClick = (modelName: string) => {
+      setPredictDlgProps((prev: any) => ({
+        ...prev,
+        open: true,
+        modelName
+      }))
+    };
+
     const [loading, setloader] = useState(true);
     const [models, setModels] = useState<any>([]);
     useEffect(() => {
@@ -132,6 +149,7 @@ const Dashboard: FC<any> = () => {
         <>
           <CreateDialogComponent {...createDlgProps} />
           <EditDialogComponent {...editDlgProps} />
+          <PredictDialogComponent {...predictDlgProps} />
           <div className={classes.dashboardCntr}>
             <div className={classes.dashboardTable}>
             <div style={{textAlign: "right"}}>
@@ -193,7 +211,7 @@ const Dashboard: FC<any> = () => {
                           Running
                         </div>
                         <div>
-                          <Button variant="contained">Predict</Button>
+                          <Button variant="contained" onClick={() => handlePreditClick(model.modelName)}>Predict</Button>
                           <Button variant="contained">Explain</Button>
                           <Button variant="contained" onClick={() => handleEditClick(model.modelName)}>Edit</Button>
                           <Button variant="contained">Delete</Button>

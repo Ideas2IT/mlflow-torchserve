@@ -1,5 +1,6 @@
 import { CreateDialogComponentProps } from "../components/create/create-dialog-popup"
 import { EditDialogComponentProps } from "../components/edit/edit-dialog-popup"
+import { PredictDialogComponentProps } from "../components/predict/predict-dialog-popup"
 import { BASE_URL } from "../utils/constants"
 
 export const createService = (postObj: CreateDialogComponentProps) => {
@@ -28,4 +29,14 @@ export const getListService = () => {
 
 export const getService = (model_name: string | undefined) => {
     return fetch(`${BASE_URL}/models/${model_name}`)
+}
+
+export const getPredict = (postObj: PredictDialogComponentProps) => {
+    return fetch(`${BASE_URL}/predict`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postObj),
+    })
 }
