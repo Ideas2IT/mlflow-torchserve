@@ -37,17 +37,17 @@ const useStyles = makeStyles((theme: any) =>
   })
 );
 
-export interface PredictDialogComponentProps {
+export interface PredictResultDialogComponentProps {
   model_name: string,
   predict_file: any
 }
      
-const PredictDialogComponent: FC<DialogComponentProps> = (props: DialogComponentProps) => {
+const PredictResultDialogComponent: FC<DialogComponentProps> = (props: DialogComponentProps) => {
     const classes = useStyles();  
     const {
         open,
         onCancelPressed = ()=> {},
-        onSubmitPressed = () => {},
+        onPreditAnotherPressed= (modelName: string) => {},
         modelName
     } = props;
 
@@ -57,7 +57,7 @@ const PredictDialogComponent: FC<DialogComponentProps> = (props: DialogComponent
     }
 
     const [openState, setOpenState] = useState<boolean>(open);
-    const [modelState, setModelState] = useState<PredictDialogComponentProps>(defaultModelData);
+    const [modelState, setModelState] = useState<PredictResultDialogComponentProps  >(defaultModelData);
 
     useEffect(() => {
         setOpenState(open);
@@ -76,34 +76,8 @@ const PredictDialogComponent: FC<DialogComponentProps> = (props: DialogComponent
       onCancelPressed();
     };
 
-    const handleFiles = (fileContent: any, file: any) => {
-      setModelState(
-        (prev: any) => {
-          let files = prev['predict_file'];
-          if(fileContent) {
-            files = {
-              content: fileContent,
-              details: file,
-            };
-          } else {
-            files = null
-          }
-          return { ...prev, files };
-        });
-    }
-
-    const handleSubmit = () => {
-      onSubmitPressed();
-      // editService(modelState)    
-      // .then(res => res.json())
-      // .then(
-      //   (result) => {
-      //     handleClose();
-      //   },
-      //   (error) => {
-          
-      //   }
-      // )
+    const handlePreditAnother = () => {
+      onPreditAnotherPressed(modelState.model_name);
     }
 
     return (  
@@ -116,22 +90,23 @@ const PredictDialogComponent: FC<DialogComponentProps> = (props: DialogComponent
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle className={classes.dialogTitle}>
-          <span>Predict</span>
+          <span>Predict - Results</span>
           <div className={classes.clearIcon} onClick={handleClose}>
             <CloseSharp />
           </div> 
         </DialogTitle>
         <DialogContent dividers className={classes.dialogContent}>
-            <Predict model={modelState} handleFileChange={handleFiles} />
+            {/* <Predict model={modelState} handleFileChange={handleFiles} /> */}
+            <div>{modelState.model_name}</div>
         </DialogContent>
         <DialogActions>
-          {/* <Button variant="contained" className={classes.footerButton} onClick={handleClose}>Cancel</Button> */}
-          <Button variant="contained" className={classes.footerButton} onClick={handleSubmit} autoFocus>
-              Submit
+          <Button variant="contained" className={classes.footerButton} onClick={handleClose}>Cancel</Button>
+          <Button variant="contained" className={classes.footerButton} onClick={handlePreditAnother} autoFocus>
+              Predict Another
           </Button>
         </DialogActions>
       </Dialog>
     );
  }
 
- export default PredictDialogComponent;
+ export default PredictResultDialogComponent;

@@ -5,6 +5,7 @@ import { Backdrop, Button, Chip, CircularProgress } from "@mui/material";
 import { getListService } from "../../services/api-service";
 import EditDialogComponent from "../edit/edit-dialog-popup";
 import PredictDialogComponent from "../predict/predict-dialog-popup";
+import PredictResultDialogComponent from "../predict/predict-result-dialog-popup";
 
 // constants
 
@@ -70,6 +71,8 @@ export interface DialogComponentProps {
   open: boolean,
   modelName?: string,
   onCancelPressed?: () => void,
+  onSubmitPressed?: () => void,
+  onPreditAnotherPressed?: (modelName: string) => void
 }
 
 const Dashboard: FC<any> = () => {
@@ -105,11 +108,20 @@ const Dashboard: FC<any> = () => {
       }))
     };
 
+    const preditResultDefaultDlgProps: DialogComponentProps = {
+      open: false,
+      modelName: '',
+      onCancelPressed: () => {
+        setPredictResultDlgProps(preditResultDefaultDlgProps);
+      }
+    }
+    const [predictResultDlgProps, setPredictResultDlgProps] = useState<DialogComponentProps>(preditResultDefaultDlgProps);
+
     const preditDefaultDlgProps: DialogComponentProps = {
       open: false,
       modelName: '',
       onCancelPressed: () => {
-        setEditDlgProps(preditDefaultDlgProps);
+        setPredictDlgProps(preditDefaultDlgProps);
       }
     }
     const [predictDlgProps, setPredictDlgProps] = useState<DialogComponentProps>(preditDefaultDlgProps);
@@ -117,7 +129,19 @@ const Dashboard: FC<any> = () => {
       setPredictDlgProps((prev: any) => ({
         ...prev,
         open: true,
-        modelName
+        modelName,
+        onSubmitPressed: () => {
+          setPredictDlgProps(preditDefaultDlgProps);
+          setPredictResultDlgProps((prev: any) => ({
+            ...prev,
+            open: true,
+            modelName,
+            onPreditAnotherPressed: (modelName: string) => {
+              setPredictResultDlgProps(predictResultDlgProps)
+              handlePreditClick(modelName)
+            }
+          }))
+        }
       }))
     };
 
@@ -150,6 +174,7 @@ const Dashboard: FC<any> = () => {
           <CreateDialogComponent {...createDlgProps} />
           <EditDialogComponent {...editDlgProps} />
           <PredictDialogComponent {...predictDlgProps} />
+          <PredictResultDialogComponent {...predictResultDlgProps} />
           <div className={classes.dashboardCntr}>
             <div className={classes.dashboardTable}>
             <div style={{textAlign: "right"}}>
