@@ -38,28 +38,57 @@ def get_deployments(name):
     return json.dumps(deploy)
 
 
+def save_files_to_disk(file_list):
+    saved_file_info = {}
+    for efile in file_list:
+        file_data = file_list.get(efile)
+        file_name = file_data.filename
+        print("Saving filename: ", file_name)
+        save_path = "test/{file_name}".format(file_name=file_name)
+        content = file_data.read()
+        with open(save_path, "wb") as binary_file:
+            binary_file.write(content)
+        saved_file_info[efile] = save_path
+    return saved_file_info
+
+
 @app.route('/create', methods=["POST"])
 def create_mt_deployment():
-    # data = request.form
-    # files = request.files
-    # model_file = files.get('model_file')
-    # handler_file = files.get('handler_file')
-    # m_file = NamedTemporaryFile()
-    # m_file.write(model_file.read())
-    # h_file = NamedTemporaryFile()
-    # h_file.write(handler_file.read())
-    data = request.get_json()
+    saved_file_info = {}
+    files = request.files
+    if files:
+        saved_file_info = save_files_to_disk(files)
+    else:
+        saved_file_info["model_file"]  = request.form.get("model_file")
+        saved_file_info["handler_file"]  = request.form.get("handler_file")
+        saved_file_info["extra_files"]  = request.form.get("extra_files")
+        saved_file_info["model_url"]  = request.form.get("model_url")
+
+    print("Saved file info: ", saved_file_info)
+
     config = {
-        "MODEL_FILE": data.get("model_file"),
-        "HANDLER": data.get("handler_file"),
-        "EXTRA_FILES": data.get("extra_files"),
-        "EXPORT_PATH": data.get("model_export_path")
+        "MODEL_FILE": saved_file_info.get("model_file"),
+        "HANDLER": saved_file_info.get("handler_file"),
     }
-    result = plugin.create_deployment(
-        name=data.get("model_name"),
-        model_uri=data.get("model_uri"),
-        config=config,
-    )
+    if "extra_files" in saved_file_info and saved_file_info["extra_files"]:
+        config["EXTRA_FILES"] = saved_file_info.get("extra_files")
+
+    response = {}
+    try:
+        result = plugin.create_deployment(
+            name=request.form.get("model_name"),
+            model_uri=saved_file_info.get("model_url"),
+            config=config,
+        )
+
+        response["status"] = "SUCCESS"
+        response["data"] = result
+        print(result)
+    except Exception as err:
+        result = err
+        response["status"] = "FAILURE"
+        response["error"] = err
+
 
     return result
 
@@ -72,5 +101,10 @@ def predict():
     result = plugin.predict(deployment_name=data["model_name"], df=df)
     return json.dumps(result)
 
+
+@app.route('/models', methods=["GET"])
+def models():
+    return True
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
