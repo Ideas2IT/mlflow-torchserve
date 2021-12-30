@@ -1,13 +1,61 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.MuiFormControl-root {
+  width: 150px;
+}
+
+.MuiInputLabel-root {
+  margin-top: 5px;
+}
+
+.MuiOutlinedInput-root {
+  height: 35px;
+  margin-top: 5px;
+}
+
+.MuiDialog-container .MuiFormControl-root {
+  width: 350px;
+}
+.MuiButton-root {
+  margin-right: 10px;
+  background-color: rgb(35, 116, 187);
+  border-color: rgb(35, 116, 187);
+}
+.MuiButton-root#headerOptionsBtn {
+  width: 125px;
+}
+
+.MuiButton-root:hover {
+  color: rgb(35, 116, 187);
+  background-color: white;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent; /* make scrollbar transparent */
+}
+
+.makeStyles-root-40, .makeStyles-root-52 {
+  justify-content: initial;
+}
+
+.iciELI {
+  margin: 0 auto;
+}
+
+.makeStyles-firstFieldRow-44,.makeStyles-otherFieldRow-45,.makeStyles-choiceOrOption-50 {
+  padding-right: 50px;
+  width: inherit
 }
