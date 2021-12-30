@@ -57,7 +57,10 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
 ) => {
   const classes = useStyles();
   const { open, onCancelPressed = () => {} } = props;
-
+  const [newModal, setNewModal] = useState({
+    name: "",
+    version: "",
+  });
   const defaultModelData = {
     model_name: "",
     target: "Torchserve 1",
@@ -69,7 +72,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
       model_url: null,
       model_file: null,
       handler_file: null,
-      extra_files: [],
+      extra_files: {},
     },
   };
   const [openState, setOpenState] = useState<boolean>(open);
@@ -90,7 +93,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
     // if (id === "extra_files") {
     //   setModelState((prev: any) => {
     //     let files = prev.files;
-    //     files[id] = [...files[id], file];
+    //     files[id] = { ...files[id], [file.name]: file };
     //     return { ...prev, files };
     //   });
     // } else {
@@ -99,6 +102,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
         files[id] = file;
         return { ...prev, files };
       });
+    // }
   };
 
   const handleChange = (event: any) => {
@@ -112,13 +116,23 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
 
   const handleSubmit = () => {
     createService(constructCreatePayload(modelState))
-      .then((res) => res.data.json())
+      .then((res) => res.data)
       .then(
         (result) => {
-          console.log(result);
+          if (result.data && result.data.name) {
+            let [name, version] = result.data.name.split("/");
+            props.newModal({ name, version });
+          }
           handleClose();
         },
-        (error) => {}
+        (error) => {
+          // let result = { name: "titanic/8.0" };
+          // if (result && result.name) {
+          //   let [name, version] = result.name.split("/");
+          //   props.newModal({ name, version });
+          // }
+          // handleClose();
+        }
       );
   };
 

@@ -23,7 +23,7 @@ const useStyles = makeStyles((theme: any) =>
       border: "2px solid black",
       display: "flex",
       padding: "15px",
-      marginTop: "20px"
+      marginTop: "20px",
     },
     tableBody: {
       border: "1px solid grey",
@@ -62,200 +62,224 @@ const useStyles = makeStyles((theme: any) =>
     },
     tableBodyContent__status: {
       width: "10%",
-    }
+    },
   })
 );
 
 export interface DialogComponentProps {
-  open: boolean,
-  modelName?: string,
-  onCancelPressed?: () => void,
-  onSubmitPressed?: () => void,
-  onPreditAnotherPressed?: (modelName: string) => void
+  open: boolean;
+  modelName?: string;
+  newModal?: any;
+  onCancelPressed?: () => void;
+  onSubmitPressed?: () => void;
+  onPreditAnotherPressed?: (modelName: string) => void;
 }
 
 const Dashboard: FC<any> = () => {
-    const classes = useStyles();
+  const classes = useStyles();
 
-    const createDefaultDlgProps: DialogComponentProps = {
-      open: false,
-      onCancelPressed: () => {
-        setCreateDlgProps(createDefaultDlgProps);
-      },
-    }
-    const [createDlgProps, setCreateDlgProps] = useState<DialogComponentProps>(createDefaultDlgProps);
-    const handleCreateClick = () => {
-      setCreateDlgProps((prev: any) => ({
-        ...prev,
-        open: true
-      }))
-    };
-
-    const editDefaultDlgProps: DialogComponentProps = {
-      open: false,
-      modelName: '',
-      onCancelPressed: () => {
-        setEditDlgProps(editDefaultDlgProps);
-      },
-    }
-    const [editDlgProps, setEditDlgProps] = useState<DialogComponentProps>(editDefaultDlgProps);
-    const handleEditClick = (modelName: string) => {
-      setEditDlgProps((prev: any) => ({
-        ...prev,
-        open: true,
-        modelName
-      }))
-    };
-
-    const preditResultDefaultDlgProps: DialogComponentProps = {
-      open: false,
-      modelName: '',
-      onCancelPressed: () => {
-        setPredictResultDlgProps(preditResultDefaultDlgProps);
-      }
-    }
-    const [predictResultDlgProps, setPredictResultDlgProps] = useState<DialogComponentProps>(preditResultDefaultDlgProps);
-
-    const preditDefaultDlgProps: DialogComponentProps = {
-      open: false,
-      modelName: '',
-      onCancelPressed: () => {
-        setPredictDlgProps(preditDefaultDlgProps);
-      }
-    }
-    const [predictDlgProps, setPredictDlgProps] = useState<DialogComponentProps>(preditDefaultDlgProps);
-    const handlePreditClick = (modelName: string) => {
-      setPredictDlgProps((prev: any) => ({
-        ...prev,
-        open: true,
-        modelName,
-        onSubmitPressed: () => {
-          setPredictDlgProps(preditDefaultDlgProps);
-          setPredictResultDlgProps((prev: any) => ({
-            ...prev,
-            open: true,
-            modelName,
-            onPreditAnotherPressed: (modelName: string) => {
-              setPredictResultDlgProps(predictResultDlgProps)
-              handlePreditClick(modelName)
-            }
-          }))
-        }
-      }))
-    };
-
-    const [loading, setloader] = useState(true);
-    const [models, setModels] = useState<any>([]);
-    useEffect(() => {
-      getListService()
-        .then((res) => res.json())
-        .then(
-          (result) => {
-            setModels(result);
-            setloader(false);
-          },
-          (error) => {
-            setModels([
-              { modelName: "squeezenet1_1", modelUrl: "squeezenet1_1.mar" },
-              { modelName: "squeezenet2_1", modelUrl: "squeezenet2_1.mar" },
-              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-              { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-            ]);
-            setloader(false);
-          }
-        );
-    }, []);
-
-    return (
-        <StylesProvider injectFirst>
-          <CreateDialogComponent {...createDlgProps} />
-          <EditDialogComponent {...editDlgProps} />
-          <PredictDialogComponent {...predictDlgProps} />
-          <PredictResultDialogComponent {...predictResultDlgProps} />
-          <div className={classes.dashboardCntr}>
-            <div className={classes.dashboardTable}>
-            <div style={{textAlign: "right"}}>
-              <Button variant="contained" onClick={handleCreateClick}>New</Button>
-            </div>
-              {!loading ? (
-                <>
-                  <div className={classes.tableHeader}>
-                    <div
-                      className={[
-                        classes.tableHeaderContent,
-                        classes.tableHeaderContent__name,
-                      ].join(" ")}
-                    >
-                      Model Name
-                    </div>
-                    <div
-                      className={[
-                        classes.tableHeaderContent,
-                        classes.tableHeaderContent__scripts,
-                      ].join(" ")}
-                    >
-                      Scripts
-                    </div>
-                    <div
-                      className={[
-                        classes.tableHeaderContent,
-                        classes.tableHeaderContent__status,
-                      ].join(" ")}
-                    >
-                      Status
-                    </div>
-                  </div>
-                  <div className={classes.tableBody}>
-                    {models.map((model: any, index: number) => (
-                      <div key={index} className={classes.tableBodyRow}>
-                        <div
-                          className={[
-                            classes.tableBodyContent,
-                            classes.tableBodyContent__name,
-                          ].join(" ")}
-                        >
-                          {model.modelName}
-                        </div>
-                        <div
-                          className={[
-                            classes.tableBodyContent,
-                            classes.tableBodyContent__scripts,
-                          ].join(" ")}
-                        >
-                          <Chip label="Chip Filled" />
-                        </div>
-                        <div
-                          className={[
-                            classes.tableBodyContent,
-                            classes.tableBodyContent__status,
-                          ].join(" ")}
-                        >
-                          Running
-                        </div>
-                        <div>
-                          <Button variant="contained" onClick={() => handlePreditClick(model.modelName)}>Predict</Button>
-                          <Button variant="contained">Explain</Button>
-                          <Button variant="contained" onClick={() => handleEditClick(model.modelName)}>Edit</Button>
-                          <Button variant="contained">Delete</Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <Backdrop
-                  sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                  open={loading}
-                >
-                  <CircularProgress color="inherit" />
-                </Backdrop>
-              )}
-            </div>
-          </div>
-        </StylesProvider>
-    );
+  const createDefaultDlgProps: DialogComponentProps = {
+    open: false,
+    onCancelPressed: () => {
+      setCreateDlgProps(createDefaultDlgProps);
+    },
   };
+  const [createDlgProps, setCreateDlgProps] = useState<DialogComponentProps>(
+    createDefaultDlgProps
+  );
+  const handleCreateClick = () => {
+    setCreateDlgProps((prev: any) => ({
+      ...prev,
+      open: true,
+    }));
+  };
+
+  const editDefaultDlgProps: DialogComponentProps = {
+    open: false,
+    modelName: "",
+    onCancelPressed: () => {
+      setEditDlgProps(editDefaultDlgProps);
+    },
+  };
+  const [editDlgProps, setEditDlgProps] =
+    useState<DialogComponentProps>(editDefaultDlgProps);
+  const handleEditClick = (modelName: string) => {
+    setEditDlgProps((prev: any) => ({
+      ...prev,
+      open: true,
+      modelName,
+    }));
+  };
+
+  const populateModal = (modal: any) => {
+    console.log("Populate model: ", modal);
+    models.push({modelName: modal.name, version: modal.verion})
+  };
+
+  const preditResultDefaultDlgProps: DialogComponentProps = {
+    open: false,
+    modelName: "",
+    onCancelPressed: () => {
+      setPredictResultDlgProps(preditResultDefaultDlgProps);
+    },
+  };
+  const [predictResultDlgProps, setPredictResultDlgProps] =
+    useState<DialogComponentProps>(preditResultDefaultDlgProps);
+
+  const preditDefaultDlgProps: DialogComponentProps = {
+    open: false,
+    modelName: "",
+    onCancelPressed: () => {
+      setPredictDlgProps(preditDefaultDlgProps);
+    },
+  };
+  const [predictDlgProps, setPredictDlgProps] = useState<DialogComponentProps>(
+    preditDefaultDlgProps
+  );
+  const handlePreditClick = (modelName: string) => {
+    setPredictDlgProps((prev: any) => ({
+      ...prev,
+      open: true,
+      modelName,
+      onSubmitPressed: () => {
+        setPredictDlgProps(preditDefaultDlgProps);
+        setPredictResultDlgProps((prev: any) => ({
+          ...prev,
+          open: true,
+          modelName,
+          onPreditAnotherPressed: (modelName: string) => {
+            setPredictResultDlgProps(predictResultDlgProps);
+            handlePreditClick(modelName);
+          },
+        }));
+      },
+    }));
+  };
+
+  const [loading, setloader] = useState(true);
+  const [models, setModels] = useState<any>([]);
+  useEffect(() => {
+    getListService()
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          setModels(result);
+          setloader(false);
+        },
+        (error) => {
+          setModels([
+            { modelName: "squeezenet1_1", modelUrl: "squeezenet1_1.mar" },
+            { modelName: "squeezenet2_1", modelUrl: "squeezenet2_1.mar" },
+            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+          ]);
+          setloader(false);
+        }
+      );
+  }, []);
+
+  return (
+    <StylesProvider injectFirst>
+      <CreateDialogComponent {...createDlgProps} newModal={populateModal} />
+      <EditDialogComponent {...editDlgProps} />
+      <PredictDialogComponent {...predictDlgProps} />
+      <PredictResultDialogComponent {...predictResultDlgProps} />
+      <div className={classes.dashboardCntr}>
+        <div className={classes.dashboardTable}>
+          <div style={{ textAlign: "right" }}>
+            <Button variant="contained" onClick={handleCreateClick}>
+              New
+            </Button>
+          </div>
+          {!loading ? (
+            <>
+              <div className={classes.tableHeader}>
+                <div
+                  className={[
+                    classes.tableHeaderContent,
+                    classes.tableHeaderContent__name,
+                  ].join(" ")}
+                >
+                  Model Name
+                </div>
+                <div
+                  className={[
+                    classes.tableHeaderContent,
+                    classes.tableHeaderContent__scripts,
+                  ].join(" ")}
+                >
+                  Scripts
+                </div>
+                <div
+                  className={[
+                    classes.tableHeaderContent,
+                    classes.tableHeaderContent__status,
+                  ].join(" ")}
+                >
+                  Status
+                </div>
+              </div>
+              <div className={classes.tableBody}>
+                {models.map((model: any, index: number) => (
+                  <div key={index} className={classes.tableBodyRow}>
+                    <div
+                      className={[
+                        classes.tableBodyContent,
+                        classes.tableBodyContent__name,
+                      ].join(" ")}
+                    >
+                      {model.modelName}
+                    </div>
+                    <div
+                      className={[
+                        classes.tableBodyContent,
+                        classes.tableBodyContent__scripts,
+                      ].join(" ")}
+                    >
+                      <Chip label="Chip Filled" />
+                    </div>
+                    <div
+                      className={[
+                        classes.tableBodyContent,
+                        classes.tableBodyContent__status,
+                      ].join(" ")}
+                    >
+                      Running
+                    </div>
+                    <div>
+                      <Button
+                        variant="contained"
+                        onClick={() => handlePreditClick(model.modelName)}
+                      >
+                        Predict
+                      </Button>
+                      <Button variant="contained">Explain</Button>
+                      <Button
+                        variant="contained"
+                        onClick={() => handleEditClick(model.modelName)}
+                      >
+                        Edit
+                      </Button>
+                      <Button variant="contained">Delete</Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <Backdrop
+              sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={loading}
+            >
+              <CircularProgress color="inherit" />
+            </Backdrop>
+          )}
+        </div>
+      </div>
+    </StylesProvider>
+  );
+};
 
 export default Dashboard;

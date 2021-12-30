@@ -61,7 +61,7 @@ const Create: FC<CreateComponentProps> = (
 ): ReactElement => {
   const classes = useStyles();
   const { model, handleChange, handleFileChange } = props;
-  const [extra_files, setExtraFiles] = useState([]);
+  const [extra_files, setExtraFiles] = useState(model.files.extra_files);
   useEffect(() => {
     setExtraFiles(model.files.extra_files);
   }, [model.files.extra_files]);
@@ -247,7 +247,7 @@ const Create: FC<CreateComponentProps> = (
         </div>
       )}
 
-      {extra_files.length === 0 ? (
+      {Object.entries(extra_files).length === 0 ? (
         <div className={`${classes.root} ${classes.otherRowPadding}`}>
           <div className={classes.otherFieldRow}>
             <div className={classes.fieldName}>Extra Files</div>
@@ -283,21 +283,18 @@ const Create: FC<CreateComponentProps> = (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
           <div className={classes.otherFieldRow}>
             <div className={classes.fieldName}>Extra Files</div>
-            {/* {extra_files.map((file: any, index: number) => (
+            {Object.entries(extra_files).map((file: any, index: number) => (
               <Chip
-                label={file.name}
+                label={file[0]}
                 key={index}
                 onDelete={() => {
-                  setExtraFiles(
-                    extra_files.filter(
-                      (exFile: any) => exFile.name !== file.name
-                    )
-                  );
-                  console.log(model.files.extra_files);
+                  delete model.files.extra_files[file[0]];
+                  console.log(model.files.extra_files)
+                  // setExtraFiles(extra_files);
                 }}
               />
-            ))} */}
-            <TextField id="outlined-basic extra_files_name" 
+            ))}
+            {/* <TextField id="outlined-basic extra_files_name" 
                         className={classes.textField}
                         name="extra_files_name"
                         value={model.files.extra_files.name}
@@ -305,15 +302,15 @@ const Create: FC<CreateComponentProps> = (
                         variant="outlined" 
                         InputProps={{
                             readOnly: true,
-                        }}/>
+                        }}/> */}
           </div>
           <div className={classes.resetFileUpload}>
-                    <Button variant="contained"
+            {/* <Button variant="contained"
                         onClick={() => {
                             handleFileChange(null, 'extra_files')
                         }}
-                    > Reset </Button>
-                </div>
+                    > Reset </Button> */}
+          </div>
           <div className={classes.fileUpload}>
             <FileUpload id="extra_files" handleFileChange={handleFileChange} />
           </div>

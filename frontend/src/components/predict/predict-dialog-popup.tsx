@@ -92,10 +92,11 @@ const PredictDialogComponent: FC<DialogComponentProps> = (
     formData.append("model_name", modelState.model_name);
     formData.append("model_inputPath", modelState.model_inputPath);
     predictService(formData)
-      .then((res) => res.data.json())
+      .then((res) => res.data)
       .then(
         (result) => {
-          console.log(result)
+          console.log("Printing result")
+          console.log(result.data)
           handleClose();
         },
         (error) => {}
