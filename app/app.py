@@ -90,8 +90,9 @@ def create_mt_deployment():
         response["status"] = "FAILURE"
         response["error"] = exception_string
 
-    if os.path.exists(upload_folder):
-        shutil.rmtree(upload_folder)
+    finally:
+        if os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
 
     return response
 
@@ -135,11 +136,38 @@ def ping():
 
 @app.route('/predict', methods=["POST"])
 def predict():
-    data = request.get_json()
-    input_path = data["model_inputPath"]
-    df = pd.read_json(input_path)
-    result = plugin.predict(deployment_name=data["model_name"], df=df)
-    return json.dumps(result)
+    response = {}
+    model_name = request.form.get("model_name")
+    saved_file_info = {}
+    files = request.files
+    upload_folder = tempfile.mkdtemp()
+    if files:
+        saved_file_info = save_files_to_disk(files, saved_file_info, upload_folder)
+        print(saved_file_info)
+
+    try:
+        df = pd.read_json(saved_file_info["model_inputPath"])
+        result = plugin.predict(deployment_name=model_name, df=df)
+        print(result)
+        response["status"] = "SUCCESS"
+        response["data"] = result
+    except Exception as e:
+        exc_info = sys.exc_info()
+        exception_string = ''.join(traceback.format_exception(*exc_info))
+        response["status"] = "FAILURE"
+        response["error"] = exception_string
+
+    finally:
+        if os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
+
+    return response
+
+    # data = request.get_json()
+    # input_path = data["model_inputPath"]
+    # df = pd.read_json(input_path)
+    # result = plugin.predict(deployment_name=data["model_name"], df=df)
+    # return json.dumps(result)
 
 
 @app.route('/models', methods=["GET"])
