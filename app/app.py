@@ -1,5 +1,9 @@
 import json
 import pandas as pd
+import os
+import requests
+import subprocess
+from threading import Thread
 from tempfile import NamedTemporaryFile
 
 from flask import Flask
@@ -91,6 +95,43 @@ def create_mt_deployment():
 
 
     return result
+
+
+def async_run(command):
+    output = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    output.communicate()
+
+
+@app.route('/start_torchserve', methods=["POST"])
+def start_torchserve():
+    cmd = "torchserve --start --model-store model_store"
+    os.makedirs('model_store', exist_ok=True)
+    t = Thread(target=async_run, args=(cmd,))
+    t.start()
+    res = {'status': 'Success', 'message': 'Starting...'}
+    return json.dumps(res)
+
+
+@app.route('/stop_torchserve', methods=["POST"])
+def stop_torchserve():
+    cmd = "torchserve --stop"
+    output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    res = {'status': 'Success', 'message': 'Starting...'}
+    if 'TorchServe has stopped.' not in output:
+        res = {'status': 'Success', 'message': str(output[0])}
+    return json.dumps(res)
+
+
+@app.route('/ping', methods=["GET"])
+def ping():
+    failed = {'status': 'Failed', 'message': 'Not running...'}
+    try:
+        res = requests.get('http://localhost:8080/ping')
+        if res.status_code != 200:
+            return json.dumps(failed)
+    except requests.exceptions.ConnectionError:
+        return json.dumps(failed)
+    return json.dumps({'status': 'Success', 'message': 'Running...'})
 
 
 @app.route('/predict', methods=["POST"])
