@@ -4,10 +4,15 @@ import os
 import requests
 import subprocess
 from threading import Thread
-from tempfile import NamedTemporaryFile
+import tempfile
+import sys
+import traceback
+import shutil
 
 from flask import Flask
 from flask import request
+from file_utils import save_files_to_disk
+from constants import MODEL_FILE, MODEL_URL, HANDLER_FILE, EXTRA_FILES
 from flask import after_this_request
 
 from flask_cors import CORS, cross_origin
@@ -42,59 +47,53 @@ def get_deployments(name):
     return json.dumps(deploy)
 
 
-def save_files_to_disk(file_list):
-    saved_file_info = {}
-    for efile in file_list:
-        file_data = file_list.get(efile)
-        file_name = file_data.filename
-        print("Saving filename: ", file_name)
-        save_path = "test/{file_name}".format(file_name=file_name)
-        content = file_data.read()
-        with open(save_path, "wb") as binary_file:
-            binary_file.write(content)
-        saved_file_info[efile] = save_path
-    return saved_file_info
-
-
 @app.route('/create', methods=["POST"])
 def create_mt_deployment():
     saved_file_info = {}
     files = request.files
+    upload_folder = tempfile.mkdtemp()
     if files:
-        saved_file_info = save_files_to_disk(files)
-    else:
-        saved_file_info["model_file"]  = request.form.get("model_file")
-        saved_file_info["handler_file"]  = request.form.get("handler_file")
-        saved_file_info["extra_files"]  = request.form.get("extra_files")
-        saved_file_info["model_url"]  = request.form.get("model_url")
+        saved_file_info = save_files_to_disk(files, saved_file_info, upload_folder)
+
+    if MODEL_FILE in request.form:
+        saved_file_info[MODEL_FILE] = request.form.get(MODEL_FILE)
+    if HANDLER_FILE in request.form:
+        saved_file_info[HANDLER_FILE] = request.form.get(HANDLER_FILE)
+    if EXTRA_FILES in request.form:
+        saved_file_info[EXTRA_FILES] = request.form.get(EXTRA_FILES)
+    if MODEL_URL in request.form:
+        saved_file_info[MODEL_URL] = request.form.get(MODEL_URL)
 
     print("Saved file info: ", saved_file_info)
 
     config = {
-        "MODEL_FILE": saved_file_info.get("model_file"),
-        "HANDLER": saved_file_info.get("handler_file"),
+        MODEL_FILE: saved_file_info.get(MODEL_FILE),
+        "HANDLER": saved_file_info.get(HANDLER_FILE),
     }
-    if "extra_files" in saved_file_info and saved_file_info["extra_files"]:
-        config["EXTRA_FILES"] = saved_file_info.get("extra_files")
+    if EXTRA_FILES in saved_file_info and saved_file_info[EXTRA_FILES]:
+        config[EXTRA_FILES] = saved_file_info.get(EXTRA_FILES)
 
     response = {}
     try:
         result = plugin.create_deployment(
             name=request.form.get("model_name"),
-            model_uri=saved_file_info.get("model_url"),
+            model_uri=saved_file_info.get(MODEL_URL),
             config=config,
         )
 
         response["status"] = "SUCCESS"
         response["data"] = result
         print(result)
-    except Exception as err:
-        result = err
+    except Exception as e:
+        exc_info = sys.exc_info()
+        exception_string = ''.join(traceback.format_exception(*exc_info))
         response["status"] = "FAILURE"
-        response["error"] = err
+        response["error"] = exception_string
 
+    if os.path.exists(upload_folder):
+        shutil.rmtree(upload_folder)
 
-    return result
+    return response
 
 
 def async_run(command):
