@@ -61,10 +61,10 @@ const Create: FC<CreateComponentProps> = (
 ): ReactElement => {
   const classes = useStyles();
   const { model, handleChange, handleFileChange } = props;
-  const [extra_files, setExtraFiles] = useState(model.files.extra_files);
+  const [extra_files, setExtraFiles] = useState(model.extra_files_list);
   useEffect(() => {
-    setExtraFiles(model.files.extra_files);
-  }, [model.files.extra_files]);
+    setExtraFiles(model.extra_files_list);
+  }, [model.extra_files_list]);
   return (
     <div>
       <div className={`${classes.root} ${classes.firstRowPadding}`}>
@@ -114,7 +114,11 @@ const Create: FC<CreateComponentProps> = (
           </div>
           <div className={classes.choiceOrOption}>or</div>
           <div className={classes.fileUpload}>
-            <FileUpload id="model_url" handleFileChange={handleFileChange} />
+            <FileUpload
+              id="model_url"
+              handleFileChange={handleFileChange}
+              multipleFiles={false}
+            />
           </div>
         </div>
       ) : (
@@ -164,7 +168,11 @@ const Create: FC<CreateComponentProps> = (
           </div>
           <div className={classes.choiceOrOption}>or</div>
           <div className={classes.fileUpload}>
-            <FileUpload id="model_file" handleFileChange={handleFileChange} />
+            <FileUpload
+              id="model_file"
+              handleFileChange={handleFileChange}
+              multipleFiles={false}
+            />
           </div>
         </div>
       ) : (
@@ -214,7 +222,11 @@ const Create: FC<CreateComponentProps> = (
           </div>
           <div className={classes.choiceOrOption}>or</div>
           <div className={classes.fileUpload}>
-            <FileUpload id="handler_file" handleFileChange={handleFileChange} />
+            <FileUpload
+              id="handler_file"
+              handleFileChange={handleFileChange}
+              multipleFiles={false}
+            />
           </div>
         </div>
       ) : (
@@ -247,7 +259,7 @@ const Create: FC<CreateComponentProps> = (
         </div>
       )}
 
-      {Object.entries(extra_files).length === 0 ? (
+      {extra_files.length === 0 ? (
         <div className={`${classes.root} ${classes.otherRowPadding}`}>
           <div className={classes.otherFieldRow}>
             <div className={classes.fieldName}>Extra Files</div>
@@ -276,21 +288,27 @@ const Create: FC<CreateComponentProps> = (
           </div>
           <div className={classes.choiceOrOption}>or</div>
           <div className={classes.fileUpload}>
-            <FileUpload id="extra_files" handleFileChange={handleFileChange} />
+            <FileUpload
+              id="extra_files"
+              handleFileChange={handleFileChange}
+              multipleFiles={true}
+            />
           </div>
         </div>
       ) : (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
           <div className={classes.otherFieldRow}>
             <div className={classes.fieldName}>Extra Files</div>
-            {Object.entries(extra_files).map((file: any, index: number) => (
+            {extra_files.map((file: any, index: number) => (
               <Chip
-                label={file[0]}
+                label={file.name}
                 key={index}
                 onDelete={() => {
-                  delete model.files.extra_files[file[0]];
-                  console.log(model.files.extra_files)
-                  // setExtraFiles(extra_files);
+                  let files = extra_files;
+                  files = files.filter((file: any, i: number) => index !== i);
+                  setExtraFiles(files);
+                  handleFileChange(files, 'extra_files');
+                  console.log(files);
                 }}
               />
             ))}
@@ -312,7 +330,11 @@ const Create: FC<CreateComponentProps> = (
                     > Reset </Button> */}
           </div>
           <div className={classes.fileUpload}>
-            <FileUpload id="extra_files" handleFileChange={handleFileChange} />
+            <FileUpload
+              id="extra_files"
+              handleFileChange={handleFileChange}
+              multipleFiles={true}
+            />
           </div>
         </div>
       )}

@@ -83,7 +83,8 @@ const EditDialogComponent: FC<DialogComponentProps> = (props: DialogComponentPro
         model_file: null,
         handler_file: null,
         extra_files: null,
-      }
+      },
+      extra_files_list: []
     }
     const [openState, setOpenState] = useState<boolean>(open);
     const [modelState, setModelState] = useState<EditDialogComponentProps>(defaultModelData);

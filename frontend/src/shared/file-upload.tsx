@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme: any) =>
 
 export interface FileUploadComponentProps {
   id: string;
+  multipleFiles: boolean;
   handleFileChange: (file: any, id: string) => void;
 }
 
@@ -33,16 +34,32 @@ export const FileUpload: FC<FileUploadComponentProps> = (
       >
         Upload
       </Button>
-      <input
-        type="file"
-        ref={uploadInputRef}
-        id={id}
-        onChange={(event: any) => {
-          const file = event?.target?.files[0];
-          handleFileChange(event.target.files[0], id);
-        }}
-        style={{ display: "none" }}
-      />
+      {!props.multipleFiles ? (
+        <input
+          type="file"
+          ref={uploadInputRef}
+          id={id}
+          onChange={(event: any) => {
+            const file = event?.target?.files[0];
+            handleFileChange(event.target.files[0], id);
+          }}
+          style={{ display: "none" }}
+        />
+      ) : (
+        <>
+        <input
+          type="file"
+          ref={uploadInputRef}
+          id={id}
+          multiple
+          onChange={(event: any) => {
+            const file = event?.target?.files;
+            handleFileChange(event.target.files, id);
+          }}
+          style={{ display: "none" }}
+        />
+        </>
+      )}
     </div>
   );
 };

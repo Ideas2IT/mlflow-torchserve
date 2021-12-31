@@ -23,7 +23,7 @@ export const editService = (putObj: EditDialogComponentProps) => {
 };
 
 export const getListService = () => {
-  return fetch(`${BASE_URL}/list`);
+  return fetch(`${BASE_URL}/listparse`);
 };
 
 export const predictService = (requestObj: FormData) => {

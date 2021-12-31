@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme: any) =>
     tableBody: {
       border: "1px solid grey",
       borderBottom: 0,
-      height: "288px",
+      maxHeight: "288px",
       overflowY: "scroll",
     },
     tableBodyRow: {
@@ -112,8 +112,8 @@ const Dashboard: FC<any> = () => {
   };
 
   const populateModal = (modal: any) => {
-    console.log("Populate model: ", modal);
-    models.push({modelName: modal.name, version: modal.verion})
+    console.log(modal);
+    models.push({ modelName: modal.name, version: modal.verion });
   };
 
   const preditResultDefaultDlgProps: DialogComponentProps = {
@@ -168,12 +168,16 @@ const Dashboard: FC<any> = () => {
         },
         (error) => {
           setModels([
-            { modelName: "squeezenet1_1", modelUrl: "squeezenet1_1.mar" },
-            { modelName: "squeezenet2_1", modelUrl: "squeezenet2_1.mar" },
-            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
-            { modelName: "squeezenet3_1", modelUrl: "squeezenet3_1.mar" },
+            {
+              modelName: "mnist_classification",
+              modelUrl:
+                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/mnist_classification.mar",
+            },
+            {
+              modelName: "titanic",
+              modelUrl:
+                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/titanic.mar",
+            },
           ]);
           setloader(false);
         }
@@ -230,6 +234,7 @@ const Dashboard: FC<any> = () => {
                         classes.tableBodyContent__name,
                       ].join(" ")}
                     >
+                      {/* {console.log(model)} */}
                       {model.modelName}
                     </div>
                     <div
