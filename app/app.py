@@ -69,6 +69,22 @@ def create_mt_deployment():
     if files:
         saved_file_info = save_files_to_disk(files, saved_file_info, upload_folder)
 
+        extra_files_str = ""
+        keys_to_remove = []
+        for name, path in saved_file_info.items():
+            if "extra_file_" in name:
+                keys_to_remove.append(name)
+                if extra_files_str:
+                    extra_files_str = "{},{}".format(extra_files_str, path)
+                else:
+                    extra_files_str = path
+
+        for key in keys_to_remove:
+            saved_file_info.pop(key, None)
+
+        saved_file_info[EXTRA_FILES] = extra_files_str
+
+
     if MODEL_FILE in request.form:
         saved_file_info[MODEL_FILE] = request.form.get(MODEL_FILE)
     if HANDLER_FILE in request.form:
