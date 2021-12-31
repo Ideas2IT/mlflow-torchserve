@@ -37,6 +37,20 @@ def list_deployments():
     return json.dumps(result)
 
 
+@app.route('/listparse', methods=["GET"])
+@cross_origin()
+def list_parse_deployments():
+    response = []
+    try:
+        list_result = plugin.list_deployments()
+        for each_model in list_result:
+            for _, model_data in each_model.items():
+                response.append(model_data)
+    except Exception as err:
+        response = str(err)
+    return json.dumps(response)
+
+
 @app.route('/get/<name>', methods=["GET"])
 def get_deployments(name):
     try:
