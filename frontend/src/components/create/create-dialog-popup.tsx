@@ -48,7 +48,6 @@ export interface CreateDialogComponentProps {
     model_url: any;
     model_file: any;
     handler_file: any;
-    extra_files: any;
   };
   extra_files_list: any;
 }
@@ -73,7 +72,6 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
       model_url: null,
       model_file: null,
       handler_file: null,
-      extra_files: {},
     },
     extra_files_list: [],
   };
@@ -92,19 +90,21 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
   };
 
   const handleFiles = (file: any, id: string) => {
-    // if (id === "extra_files") {
-    //   setModelState((prev: any) => {
-    //     let files = prev.files;
-    //     files[id] = { ...files[id], [file.name]: file };
-    //     return { ...prev, files };
-    //   });
-    // } else {
+    if (id === "extra_files") {
+      setModelState((prev: any) => {
+        let files = [];
+        for (let i = 0; i < file.length; i++) {
+          files.push(file[i]);
+        }
+        return { ...prev, extra_files_list: files };
+      });
+    } else {
       setModelState((prev: any) => {
         let files = prev.files;
         files[id] = file;
         return { ...prev, files };
       });
-    // }
+    }
   };
 
   const handleChange = (event: any) => {
@@ -118,28 +118,31 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
 
   const handleSubmit = () => {
     createService(constructCreatePayload(modelState))
-      .then((res) => res.data)
+      .then((res) => res.data.json())
       .then(
         (result) => {
-          if (result.data && result.data.name) {
-            let [name, version] = result.data.name.split("/");
-            props.newModal({ name, version });
+          if (result && result.name) {
+            let [name, version] = result.name.split("/");
+            setNewModal({
+              name,
+              version,
+            });
           }
           handleClose();
         },
         (error) => {
-          // let result = { name: "titanic/8.0" };
-          // if (result && result.name) {
-          //   let [name, version] = result.name.split("/");
-          //   props.newModal({ name, version });
-          // }
-          // handleClose();
+          let result = { name: "titanic/8.0" };
+          if (result && result.name) {
+            let [name, version] = result.name.split("/");
+            props.newModal({ name, version });
+          }
+          handleClose();
         }
       );
   };
 
   const constructCreatePayload = (createObj: CreateDialogComponentProps) => {
-    console.log(createObj)
+    console.log(createObj);
     const formData = new FormData();
     formData.append("model_name", createObj.model_name);
     formData.append("target", createObj.target);
@@ -161,12 +164,11 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
         ? createObj.files.handler_file
         : createObj.handler_file
     );
-    formData.append(
-      "extra_files",
-      createObj.files.extra_files
-        ? createObj.files.extra_files
-        : createObj.extra_files
-    );
+    createObj.extra_files_list.length === 0
+      ? formData.append("extra_file", createObj.extra_files)
+      : createObj.extra_files_list.map((file: any, index: number) => {
+          formData.append("extra_file_" + (index + 1), file);
+        });
     return formData;
   };
 

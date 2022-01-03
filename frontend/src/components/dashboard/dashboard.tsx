@@ -2,7 +2,9 @@ import React, { FC, useState, useEffect } from "react";
 import CreateDialogComponent from "../create/create-dialog-popup";
 import { getListService } from "../../services/api-service";
 import EditDialogComponent from "../edit/edit-dialog-popup";
-import PredictDialogComponent, { PredictDialogComponentProps } from "../predict/predict-dialog-popup";
+import PredictDialogComponent, {
+  PredictDialogComponentProps,
+} from "../predict/predict-dialog-popup";
 import PredictResultDialogComponent from "../predict/predict-result-dialog-popup";
 
 import { createStyles, makeStyles, StylesProvider } from "@mui/styles";
@@ -55,24 +57,24 @@ const useStyles = makeStyles((theme: any) =>
     tableBodyContent__name: {
       fontWeight: "bold",
       width: "15%",
-      paddingTop: '5px'
+      paddingTop: "5px",
     },
     tableBodyContent__scripts: {
       width: "30%",
     },
     tableBodyContent__status: {
-      paddingTop: '7px',
+      paddingTop: "7px",
       width: "10%",
     },
     controlButton: {
-      marginRight: '10px',
-      backgroundColor: 'rgb(35, 116, 187)',
-      borderColor: 'rgb(35, 116, 187)'
+      marginRight: "10px",
+      backgroundColor: "rgb(35, 116, 187)",
+      borderColor: "rgb(35, 116, 187)",
     },
-    'controlButton:hover': {
-        color: 'rgb(35, 116, 187)',
-        backgroundColor: 'white'
-    }
+    "controlButton:hover": {
+      color: "rgb(35, 116, 187)",
+      backgroundColor: "white",
+    },
   })
 );
 
@@ -124,7 +126,8 @@ const Dashboard: FC<any> = () => {
 
   const populateModal = (modal: any) => {
     console.log(modal);
-    models.push({ modelName: modal.name, version: modal.verion });
+    getListServiceApiCall();
+    // models.push({ modelName: modal.name, version: modal.verion });
   };
 
   const preditResultDefaultDlgProps: DialogComponentProps = {
@@ -154,7 +157,7 @@ const Dashboard: FC<any> = () => {
       modelName,
       onSubmitPressed: (model: PredictDialogComponentProps) => {
         setPredictDlgProps(preditDefaultDlgProps);
-        console.log("onSubmitPressed>>>>>>>>>>>>", model)
+        console.log("onSubmitPressed>>>>>>>>>>>>", model);
         setPredictResultDlgProps((prev: any) => ({
           ...prev,
           open: true,
@@ -168,9 +171,8 @@ const Dashboard: FC<any> = () => {
     }));
   };
 
-  const [loading, setloader] = useState(true);
-  const [models, setModels] = useState<any>([]);
-  useEffect(() => {
+  const getListServiceApiCall = () => {
+    setloader(true);
     getListService()
       .then((res) => res.json())
       .then(
@@ -194,11 +196,16 @@ const Dashboard: FC<any> = () => {
           setloader(false);
         }
       );
+  };
+
+  const [loading, setloader] = useState(true);
+  const [models, setModels] = useState<any>([]);
+  useEffect(() => {
+    getListServiceApiCall();
   }, []);
 
   return (
     <>
-
       <CreateDialogComponent {...createDlgProps} newModal={populateModal} />
       <EditDialogComponent {...editDlgProps} />
       <PredictDialogComponent {...predictDlgProps} />
@@ -211,7 +218,7 @@ const Dashboard: FC<any> = () => {
               New
             </Button>
           </div>
-          {!loading ? (
+          {models.length !== 0 ? (
             <>
               <div className={classes.tableHeader}>
                 <div
@@ -275,7 +282,7 @@ const Dashboard: FC<any> = () => {
                       >
                         Predict
                       </Button>
-                      <Button 
+                      <Button
                         variant="contained"
                         className={classes.controlButton}
                       >
@@ -288,7 +295,7 @@ const Dashboard: FC<any> = () => {
                       >
                         Edit
                       </Button>
-                      <Button 
+                      <Button
                         variant="contained"
                         className={classes.controlButton}
                       >
@@ -300,12 +307,17 @@ const Dashboard: FC<any> = () => {
               </div>
             </>
           ) : (
+            ""
+          )}
+          {loading ? (
             <Backdrop
               sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
               open={loading}
             >
               <CircularProgress color="inherit" />
             </Backdrop>
+          ) : (
+            ""
           )}
         </div>
       </div>

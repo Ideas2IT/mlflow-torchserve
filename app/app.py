@@ -52,7 +52,7 @@ def list_parse_deployments():
     return json.dumps(response)
 
 
-@app.route('/get/<name>', methods=["GET"])
+@app.route('/models/<name>', methods=["GET"])
 def get_deployments(name):
     try:
         result = plugin.get_deployment(name)
