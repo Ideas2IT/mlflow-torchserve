@@ -1,6 +1,7 @@
 import axios from "axios";
 import { CreateDialogComponentProps } from "../components/create/create-dialog-popup";
 import { EditDialogComponentProps } from "../components/edit/edit-dialog-popup";
+import { ServerDialogComponentProps } from "../components/header/start-torch-server-dialog-popup";
 import { PredictDialogComponentProps } from "../components/predict/predict-dialog-popup";
 import { BASE_URL } from "../utils/constants";
 
@@ -40,6 +41,16 @@ export const getService = (model_name: string | undefined) => {
 
 export const getPredict = (postObj: PredictDialogComponentProps) => {
   return fetch(`${BASE_URL}/predict`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(postObj),
+  });
+};
+
+export const serverStatus = (postObj: ServerDialogComponentProps, endpoint: string = 'start_torchserve') => {
+  return fetch(`${BASE_URL}/${endpoint}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

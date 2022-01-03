@@ -93,36 +93,38 @@ const EditDialogComponent: FC<DialogComponentProps> = (props: DialogComponentPro
         setOpenState(open);
     }, [open])
 
-    // useEffect(() => {
-    //   getService(modelName)
-    //     .then((res: any) => res.json())
-    //     .then(
-    //       (result: any) => {
-    //         setModelState(result.items);
-    //       },
-    //       (error: any) => {
-    //         setModelState({
-    //           model_name: 'Titanic',
-    //           target: 'Torchserve',
-    //           model_url: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
-    //           model_file: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
-    //           handler_file: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
-    //           extra_files: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
-    //           export_files: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
-    //           min_workers: 1,
-    //           max_workers: 1,
-    //           batch_size: 1,
-    //           max_batch_delay: 100,
-    //           files: {
-    //             model_url: null,
-    //             model_file: null,
-    //             handler_file: null,
-    //             extra_files: null,
-    //           }
-    //         });
-    //       }
-    //     );
-    // }, []);
+    useEffect(() => {
+      if(modelName) {
+        getService(modelName)
+        .then((res: any) => res.json())
+        .then(
+          (result: any) => {
+            setModelState(result.items);
+          },
+          (error: any) => {
+            setModelState({
+              model_name: 'Titanic',
+              target: 'Torchserve',
+              model_url: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
+              model_file: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
+              handler_file: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
+              extra_files: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
+              export_files: 'https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html',
+              min_workers: 1,
+              max_workers: 1,
+              batch_size: 1,
+              max_batch_delay: 100,
+              files: {
+                model_url: null,
+                model_file: null,
+                handler_file: null,
+                extra_files: null,
+              }
+            });
+          }
+        );
+      }
+    }, [modelName]);
   
     const handleClose = () => {
       setOpenState(false);

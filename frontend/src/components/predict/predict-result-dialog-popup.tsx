@@ -10,6 +10,8 @@ import CloseSharp from "@mui/icons-material/CloseSharp";
 import Predict from "./predict";
 import { DialogComponentProps } from "../dashboard/dashboard";
 import { getPredict } from "../../services/api-service";
+import PredictResult from "./predict-result";
+import { PredictDialogComponentProps } from "./predict-dialog-popup";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -37,11 +39,6 @@ const useStyles = makeStyles((theme: any) =>
   })
 );
 
-export interface PredictResultDialogComponentProps {
-  model_name: string;
-  model_inputPath: any;
-}
-
 const PredictResultDialogComponent: FC<DialogComponentProps> = (
   props: DialogComponentProps
 ) => {
@@ -50,7 +47,7 @@ const PredictResultDialogComponent: FC<DialogComponentProps> = (
     open,
     onCancelPressed = () => {},
     onPreditAnotherPressed = (modelName: string) => {},
-    modelName,
+    predictModel,
   } = props;
 
   const defaultModelData = {
@@ -60,18 +57,15 @@ const PredictResultDialogComponent: FC<DialogComponentProps> = (
 
   const [openState, setOpenState] = useState<boolean>(open);
   const [modelState, setModelState] =
-    useState<PredictResultDialogComponentProps>(defaultModelData);
+    useState<PredictDialogComponentProps>(defaultModelData);
 
   useEffect(() => {
     setOpenState(open);
   }, [open]);
 
   useEffect(() => {
-    setModelState({
-      model_name: modelName ? modelName : "",
-      model_inputPath: null,
-    });
-  }, [modelName]);
+    setModelState(predictModel);
+  }, [predictModel]);
 
   const handleClose = () => {
     setOpenState(false);
@@ -99,9 +93,7 @@ const PredictResultDialogComponent: FC<DialogComponentProps> = (
         </div>
       </DialogTitle>
       <DialogContent dividers className={classes.dialogContent}>
-        {/* <Predict model={modelState} handleFileChange={handleFiles} /> */}
-        <div>Model: {" " + modelState.model_name}</div>
-        <div>File: {" " + modelState.model_inputPath}</div>
+        <PredictResult model={modelState}/>
       </DialogContent>
       <DialogActions>
         <Button

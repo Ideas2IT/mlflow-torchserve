@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from "react";
 import CreateDialogComponent from "../create/create-dialog-popup";
 import { getListService } from "../../services/api-service";
 import EditDialogComponent from "../edit/edit-dialog-popup";
-import PredictDialogComponent from "../predict/predict-dialog-popup";
+import PredictDialogComponent, { PredictDialogComponentProps } from "../predict/predict-dialog-popup";
 import PredictResultDialogComponent from "../predict/predict-result-dialog-popup";
 
 import { createStyles, makeStyles, StylesProvider } from "@mui/styles";
@@ -17,7 +17,7 @@ const useStyles = makeStyles((theme: any) =>
     },
     dashboardTable: {
       margin: "0 auto",
-      padding: "80px",
+      padding: "40px 80px",
     },
     tableHeader: {
       border: "2px solid black",
@@ -54,15 +54,25 @@ const useStyles = makeStyles((theme: any) =>
     },
     tableBodyContent__name: {
       fontWeight: "bold",
-      textDecoration: "underline",
       width: "15%",
+      paddingTop: '5px'
     },
     tableBodyContent__scripts: {
       width: "30%",
     },
     tableBodyContent__status: {
+      paddingTop: '7px',
       width: "10%",
     },
+    controlButton: {
+      marginRight: '10px',
+      backgroundColor: 'rgb(35, 116, 187)',
+      borderColor: 'rgb(35, 116, 187)'
+    },
+    'controlButton:hover': {
+        color: 'rgb(35, 116, 187)',
+        backgroundColor: 'white'
+    }
   })
 );
 
@@ -70,8 +80,9 @@ export interface DialogComponentProps {
   open: boolean;
   modelName?: string;
   newModal?: any;
+  predictModel?: any;
   onCancelPressed?: () => void;
-  onSubmitPressed?: () => void;
+  onSubmitPressed?: (model?: any, setAsDefault?: any) => void;
   onPreditAnotherPressed?: (modelName: string) => void;
 }
 
@@ -118,7 +129,7 @@ const Dashboard: FC<any> = () => {
 
   const preditResultDefaultDlgProps: DialogComponentProps = {
     open: false,
-    modelName: "",
+    predictModel: {},
     onCancelPressed: () => {
       setPredictResultDlgProps(preditResultDefaultDlgProps);
     },
@@ -141,12 +152,13 @@ const Dashboard: FC<any> = () => {
       ...prev,
       open: true,
       modelName,
-      onSubmitPressed: () => {
+      onSubmitPressed: (model: PredictDialogComponentProps) => {
         setPredictDlgProps(preditDefaultDlgProps);
+        console.log("onSubmitPressed>>>>>>>>>>>>", model)
         setPredictResultDlgProps((prev: any) => ({
           ...prev,
           open: true,
-          modelName,
+          predictModel: model,
           onPreditAnotherPressed: (modelName: string) => {
             setPredictResultDlgProps(predictResultDlgProps);
             handlePreditClick(modelName);
@@ -185,11 +197,13 @@ const Dashboard: FC<any> = () => {
   }, []);
 
   return (
-    <StylesProvider injectFirst>
+    <>
+
       <CreateDialogComponent {...createDlgProps} newModal={populateModal} />
       <EditDialogComponent {...editDlgProps} />
       <PredictDialogComponent {...predictDlgProps} />
       <PredictResultDialogComponent {...predictResultDlgProps} />
+
       <div className={classes.dashboardCntr}>
         <div className={classes.dashboardTable}>
           <div style={{ textAlign: "right" }}>
@@ -255,19 +269,31 @@ const Dashboard: FC<any> = () => {
                     </div>
                     <div>
                       <Button
+                        className={classes.controlButton}
                         variant="contained"
                         onClick={() => handlePreditClick(model.modelName)}
                       >
                         Predict
                       </Button>
-                      <Button variant="contained">Explain</Button>
+                      <Button 
+                        variant="contained"
+                        className={classes.controlButton}
+                      >
+                        Explain
+                      </Button>
                       <Button
+                        className={classes.controlButton}
                         variant="contained"
                         onClick={() => handleEditClick(model.modelName)}
                       >
                         Edit
                       </Button>
-                      <Button variant="contained">Delete</Button>
+                      <Button 
+                        variant="contained"
+                        className={classes.controlButton}
+                      >
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -283,7 +309,7 @@ const Dashboard: FC<any> = () => {
           )}
         </div>
       </div>
-    </StylesProvider>
+    </>
   );
 };
 

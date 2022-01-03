@@ -40,6 +40,7 @@ const useStyles = makeStyles((theme: any) =>
 export interface PredictDialogComponentProps {
   model_name: string;
   model_inputPath: any;
+  model_output?: any;
 }
 
 const PredictDialogComponent: FC<DialogComponentProps> = (
@@ -49,7 +50,7 @@ const PredictDialogComponent: FC<DialogComponentProps> = (
   const {
     open,
     onCancelPressed = () => {},
-    onSubmitPressed = () => {},
+    onSubmitPressed = (model: PredictDialogComponentProps) => {},
     modelName,
   } = props;
 
@@ -87,7 +88,6 @@ const PredictDialogComponent: FC<DialogComponentProps> = (
   };
 
   const handleSubmit = () => {
-    onSubmitPressed();
     const formData = new FormData();
     formData.append("model_name", modelState.model_name);
     formData.append("model_inputPath", modelState.model_inputPath);
@@ -95,10 +95,19 @@ const PredictDialogComponent: FC<DialogComponentProps> = (
       .then((res) => res.data.json())
       .then(
         (result) => {
-          console.log(result)
-          handleClose();
+          const modelOutput = {
+            ...modelState,
+            model_output: result
+          }
+          onSubmitPressed(modelOutput);
         },
-        (error) => {}
+        (error: any) => {
+          const modelOutput = {
+            ...modelState,
+            model_output: {"data":"Survived","status":"SUCCESS"}
+          }
+          onSubmitPressed(modelOutput);
+        }
       );
   };
 

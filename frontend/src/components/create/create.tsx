@@ -24,29 +24,38 @@ const useStyles = makeStyles((theme: any) =>
       padding: "10px 0px",
     },
     firstFieldRow: {
-      position: "relative",
-      width: "45%",
-    },
-    otherFieldRow: {
-      position: "relative",
-      width: "78%",
+      paddingRight: '50px'
     },
     fieldName: {
       paddingBottom: "8px",
     },
     textField: {
       width: "100%",
+      height: '35px',
+      marginTop: '5px'
     },
     fileUpload: {
       paddingTop: "28px",
+    },
+    addFileUpload: {
+      paddingTop: '28px',
+      paddingLeft: '283px'
     },
     resetFileUpload: {
       paddingTop: "28px",
       paddingLeft: "50px",
     },
     choiceOrOption: {
-      paddingTop: "32px",
+      padding: '32px 40px 0px 50px'
     },
+    main: {
+      '& .MuiFormControl-root': {
+        width: '350px'
+      },
+      '& .MuiInputLabel-root': {
+        marginTop: '5px'
+      }
+    }
   })
 );
 
@@ -66,7 +75,7 @@ const Create: FC<CreateComponentProps> = (
     setExtraFiles(model.extra_files_list);
   }, [model.extra_files_list]);
   return (
-    <div>
+    <div className={classes.main}>
       <div className={`${classes.root} ${classes.firstRowPadding}`}>
         <div className={classes.firstFieldRow}>
           <div className={classes.fieldName}>Model Name</div>
@@ -98,8 +107,8 @@ const Create: FC<CreateComponentProps> = (
       </div>
 
       {!model.files.model_url ? (
-        <div className={`${classes.root} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+        <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
+          <div>
             <div className={classes.fieldName}>Model URL</div>
             <TextField
               id="outlined-basic model_url"
@@ -123,7 +132,7 @@ const Create: FC<CreateComponentProps> = (
         </div>
       ) : (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+          <div>
             <div className={classes.fieldName}>Model URL</div>
             <TextField
               id="outlined-basic model_file_url"
@@ -152,8 +161,8 @@ const Create: FC<CreateComponentProps> = (
       )}
 
       {!model.files.model_file ? (
-        <div className={`${classes.root} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+        <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
+          <div>
             <div className={classes.fieldName}>Model File</div>
             <TextField
               id="outlined-basic model_file_url"
@@ -177,7 +186,7 @@ const Create: FC<CreateComponentProps> = (
         </div>
       ) : (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+          <div>
             <div className={classes.fieldName}>Model URL</div>
             <TextField
               id="outlined-basic model_file_name"
@@ -206,8 +215,8 @@ const Create: FC<CreateComponentProps> = (
       )}
 
       {!model.files.handler_file ? (
-        <div className={`${classes.root} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+        <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
+          <div>
             <div className={classes.fieldName}>Model Handler</div>
             <TextField
               id="outlined-basic handler_file"
@@ -231,7 +240,7 @@ const Create: FC<CreateComponentProps> = (
         </div>
       ) : (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+          <div>
             <div className={classes.fieldName}>Model Handler</div>
             <TextField
               id="outlined-basic handler_file_name"
@@ -260,8 +269,8 @@ const Create: FC<CreateComponentProps> = (
       )}
 
       {extra_files.length === 0 ? (
-        <div className={`${classes.root} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+        <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
+          <div>
             <div className={classes.fieldName}>Extra Files</div>
             {/* <TextField
               id="outlined-basic extra_files"
@@ -273,7 +282,17 @@ const Create: FC<CreateComponentProps> = (
               placeholder="Enter URL path or drag and drop file here"
               variant="outlined"
             /> */}
-            <TextareaAutosize
+            <TextField
+              id="outlined-basic extra_files"
+              name="extra_files"
+              multiline
+              rows={4}
+              value={model.extra_files}
+              onChange={handleChange}
+              placeholder="Enter URL path or drag and drop file here"
+              variant="outlined"
+            />
+            {/* <TextareaAutosize
               id="outlined-basic extra_files"
               className={classes.textField}
               name="extra_files"
@@ -281,10 +300,9 @@ const Create: FC<CreateComponentProps> = (
               onChange={handleChange}
               maxRows={4}
               minRows={4}
-              aria-label="maximum height"
-              placeholder="Maximum 4 rows"
+              placeholder="Enter URL path or drag and drop file here"
               style={{ width: 345 }}
-            />
+            /> */}
           </div>
           <div className={classes.choiceOrOption}>or</div>
           <div className={classes.fileUpload}>
@@ -297,7 +315,7 @@ const Create: FC<CreateComponentProps> = (
         </div>
       ) : (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
-          <div className={classes.otherFieldRow}>
+          <div>
             <div className={classes.fieldName}>Extra Files</div>
             {extra_files.map((file: any, index: number) => (
               <Chip
@@ -322,14 +340,14 @@ const Create: FC<CreateComponentProps> = (
                             readOnly: true,
                         }}/> */}
           </div>
-          <div className={classes.resetFileUpload}>
-            {/* <Button variant="contained"
+          {/*<div className={classes.resetFileUpload}>
+             <Button variant="contained"
                         onClick={() => {
                             handleFileChange(null, 'extra_files')
                         }}
-                    > Reset </Button> */}
-          </div>
-          <div className={classes.fileUpload}>
+                    > Reset </Button> 
+          </div>*/}
+          <div className={classes.addFileUpload}>
             <FileUpload
               id="extra_files"
               handleFileChange={handleFileChange}
