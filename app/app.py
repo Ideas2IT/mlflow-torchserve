@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import requests
 import subprocess
+import time
 from threading import Thread
 import tempfile
 import sys
@@ -134,11 +135,35 @@ def async_run(command):
 
 @app.route('/start_torchserve', methods=["POST"])
 def start_torchserve():
-    cmd = "torchserve --start --model-store model_store"
+    start_cmd = "torchserve --start --ncs --model-store model_store"
+    print("Starting torchserve")
     os.makedirs('model_store', exist_ok=True)
-    t = Thread(target=async_run, args=(cmd,))
+    t = Thread(target=async_run, args=(start_cmd,))
     t.start()
-    res = {'status': 'Success', 'message': 'Starting...'}
+
+    healthy = False
+    for _ in range(10):
+        print("Checking for health")
+        ping_data = {}
+        try:
+            # TODO Check ping status for any host
+            ping_result = requests.get("http://localhost:8080/ping").text
+            print("Ping result")
+            ping_data = json.loads(ping_result)
+        except Exception as e:
+            ping_data["status"] = "not ready"
+        if ping_data["status"] == "Healthy":
+            healthy = True
+            break
+        else:
+            print("Not healthy .. retrying")
+            time.sleep(10)
+
+    if healthy:
+        res = {'status': 'Success', 'message': 'Started'}
+    else:
+        res = {'status': 'Failure', 'message': 'Error'}
+
     return json.dumps(res)
 
 
