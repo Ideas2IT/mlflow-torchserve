@@ -22,6 +22,8 @@ from flask_cors import CORS, cross_origin
 from mlflow.deployments import get_deploy_client
 
 plugin = get_deploy_client("torchserve")
+SETTINGS_FOLDER_PATH = 'settings'
+DEFAULT_SETTINGS_FILE_PATH = os.path.join(SETTINGS_FOLDER_PATH, 'default_settings.json')
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -233,6 +235,25 @@ def delete_deployment(name):
     except Exception as err:
         result = str(err)
     return json.dumps(result)
+
+
+@app.route('/default', methods=['GET'])
+def get_default_settings():
+    if not os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
+        return json.dumps([])
+    with open(DEFAULT_SETTINGS_FILE_PATH, 'r') as f:
+        return json.loads(f.read())
+
+
+@app.route('/save_settings', methods=['POST'])
+def save_default_settings():
+    if os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
+        os.remove(DEFAULT_SETTINGS_FILE_PATH)
+    os.makedirs(SETTINGS_FOLDER_PATH, exist_ok=True)
+    with open(DEFAULT_SETTINGS_FILE_PATH, 'w') as f:
+        f.write(json.dumps(request.json))
+    return json.dumps({'status': 'Success', 'message': 'Default settings saved...'})
+
 
 if __name__ == '__main__':
     app.run(debug=False)
