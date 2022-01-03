@@ -8,8 +8,9 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
 import Create from "./create";
-import { DialogComponentProps } from "../dashboard/dashboard";
+import { DialogComponentProps, SnackBarComponentProps } from "../dashboard/dashboard";
 import { createService } from "../../services/api-service";
+import { Alert, Snackbar } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -78,6 +79,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
   const [openState, setOpenState] = useState<boolean>(open);
   const [modelState, setModelState] =
     useState<CreateDialogComponentProps>(defaultModelData);
+  const [snackBar, setSnackBar] = useState<SnackBarComponentProps>({showSnackbar: false});
 
   useEffect(() => {
     setOpenState(open);
@@ -87,6 +89,10 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
     setOpenState(false);
     setModelState(defaultModelData);
     onCancelPressed();
+  };
+
+  const handleSnackBarClose = () => {
+    setSnackBar({showSnackbar: false});
   };
 
   const handleFiles = (file: any, id: string) => {
@@ -128,9 +134,11 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
               version,
             });
           }
+          setSnackBar({showSnackbar: true, status: 'success', message: 'Model created Successfully !!'})
           handleClose();
         },
         (error) => {
+          setSnackBar({showSnackbar: true, status: 'error', message: 'Model creation Failed !!'})
           let result = { name: "titanic/8.0" };
           if (result && result.name) {
             let [name, version] = result.name.split("/");
@@ -173,45 +181,51 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
   };
 
   return (
-    <Dialog
-      maxWidth={"md"}
-      fullWidth={true}
-      open={openState}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle className={classes.dialogTitle}>
-        <span>Create Model</span>
-        <div className={classes.clearIcon} onClick={handleClose}>
-          <CloseSharp />
-        </div>
-      </DialogTitle>
-      <DialogContent dividers className={classes.dialogContent}>
-        <Create
-          model={modelState}
-          handleChange={handleChange}
-          handleFileChange={handleFiles}
-        />
-      </DialogContent>
-      <DialogActions>
-        <Button
-          variant="contained"
-          className={classes.footerButton}
-          onClick={handleClose}
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          className={classes.footerButton}
-          onClick={handleSubmit}
-          autoFocus
-        >
-          Create
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <>
+      <Dialog
+        maxWidth={"md"}
+        fullWidth={true}
+        open={openState}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle className={classes.dialogTitle}>
+          <span>Create Model</span>
+          <div className={classes.clearIcon} onClick={handleClose}>
+            <CloseSharp />
+          </div>
+        </DialogTitle>
+        <DialogContent dividers className={classes.dialogContent}>
+          <Create
+            model={modelState}
+            handleChange={handleChange}
+            handleFileChange={handleFiles}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant="contained"
+            className={classes.footerButton}
+            onClick={handleClose}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            className={classes.footerButton}
+            onClick={handleSubmit}
+            autoFocus
+          >
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog> 
+
+      <Snackbar open={snackBar.showSnackbar} autoHideDuration={6000} onClose={handleSnackBarClose}>
+        {snackBar.status && <Alert severity={snackBar.status}> {snackBar.message} </Alert>}
+      </Snackbar>   
+    </>
   );
 };
 

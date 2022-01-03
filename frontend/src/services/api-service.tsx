@@ -58,3 +58,12 @@ export const serverStatus = (postObj: ServerDialogComponentProps, endpoint: stri
     body: JSON.stringify(postObj),
   });
 };
+
+export const deleteService = (model_name: string | undefined) => {
+  return fetch(`${BASE_URL}/delete/${model_name}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

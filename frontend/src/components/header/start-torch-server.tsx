@@ -72,14 +72,13 @@ const StartTorchServer: FC<StartTorchServerComponentProps> = (
         <div><b>Model Store</b></div>
         <div>
           <RadioGroup
-            // defaultValue="female"
             name="model_store_choice"
             value={model.model_store_choice}
             onChange={handleChange}
           >
             <FormControlLabel value="start_with_previous_model" control={<Radio />} label="Start with previous session models" />
             <FormControlLabel value="start_new_instance" control={<Radio />} label="Start a clean instance" />
-            <FormControlLabel value="is_model_store_path" control={<Radio />} label="Model Store Path" />
+            <FormControlLabel value="is_model_store_path" control={<Radio />} label="Config property" />
           </RadioGroup>
         </div>
         {!model.files.model_store_path ? (

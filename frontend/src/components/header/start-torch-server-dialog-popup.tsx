@@ -11,6 +11,7 @@ import Create from "./start-torch-server";
 import { DialogComponentProps } from "../dashboard/dashboard";
 import { createService } from "../../services/api-service";
 import StartTorchServer from "./start-torch-server";
+import { CircularProgress } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -69,11 +70,11 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
     // start_with_previous_model: true,
     // start_new_instance: false,
     // is_model_store_path: false,
-    model_store_choice: "start_with_previous_model",
+    model_store_choice: "start_new_instance",
     model_store_path: "",
-    inference_address: "http://0.0.0.0:8085",
-    management_address: "http://0.0.0.0:8085",
-    metrics_address: "http://0.0.0.0:8085",
+    inference_address: "http://0.0.0.0:8080",
+    management_address: "http://0.0.0.0:8081",
+    metrics_address: "http://0.0.0.0:8082",
     model_store: "/home/ubuntu/model-store",
     files: {
       model_store_path: null
@@ -82,6 +83,7 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
   const [openState, setOpenState] = useState<boolean>(open);
   const [modelState, setModelState] =
     useState<ServerDialogComponentProps>(defaultModelData);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setOpenState(open);
@@ -111,8 +113,10 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
   };
 
   const handleSubmit = (model: any, setAsDefault: boolean) => {
+    setLoading(true);
     onSubmitPressed(model, setAsDefault)
-    onCancelPressed();
+    setTimeout(() => setLoading(false), 3000); 
+    // onCancelPressed();
   };
 
   return (
@@ -145,13 +149,18 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
         >
           Save As Default
         </Button>
+        {/* <Button variant="contained" onClick={onClick} disabled={loading}>
+          {loading && <CircularProgress size={14} />}
+          {!loading && 'Click Me'}
+        </Button>         */}
         <Button
           variant="contained"
           className={classes.footerButton}
           onClick={() => handleSubmit(modelState, false)}
           autoFocus
         >
-          Start Torchserve  
+          {loading && <CircularProgress size={14} />}
+          {!loading && 'Start Torchserve'}  
         </Button>
       </DialogActions>
     </Dialog>

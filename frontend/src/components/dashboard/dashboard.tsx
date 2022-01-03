@@ -8,7 +8,8 @@ import PredictDialogComponent, {
 import PredictResultDialogComponent from "../predict/predict-result-dialog-popup";
 
 import { createStyles, makeStyles, StylesProvider } from "@mui/styles";
-import { Backdrop, Button, Chip, CircularProgress } from "@mui/material";
+import { Alert, AlertColor, Backdrop, Button, Chip, CircularProgress, Snackbar } from "@mui/material";
+import DeleteDialogComponent from "../delete/delete-dialog-popup";
 // constants
 
 const useStyles = makeStyles((theme: any) =>
@@ -88,6 +89,12 @@ export interface DialogComponentProps {
   onPreditAnotherPressed?: (modelName: string) => void;
 }
 
+export interface SnackBarComponentProps {
+  showSnackbar: boolean,
+  status?: AlertColor,
+  message?: string
+}
+
 const Dashboard: FC<any> = () => {
   const classes = useStyles();
 
@@ -104,6 +111,23 @@ const Dashboard: FC<any> = () => {
     setCreateDlgProps((prev: any) => ({
       ...prev,
       open: true,
+    }));
+  };
+
+  const deleteDefaultDlgProps: DialogComponentProps = {
+    open: false,
+    modelName: "",
+    onCancelPressed: () => {
+      setDeleteDlgProps(editDefaultDlgProps);
+    },
+  };
+  const [deleteDlgProps, setDeleteDlgProps] =
+    useState<DialogComponentProps>(deleteDefaultDlgProps);
+  const handleDeleteClick = (modelName: string) => {
+    setDeleteDlgProps((prev: any) => ({
+      ...prev,
+      open: true,
+      modelName,
     }));
   };
 
@@ -157,7 +181,6 @@ const Dashboard: FC<any> = () => {
       modelName,
       onSubmitPressed: (model: PredictDialogComponentProps) => {
         setPredictDlgProps(preditDefaultDlgProps);
-        console.log("onSubmitPressed>>>>>>>>>>>>", model);
         setPredictResultDlgProps((prev: any) => ({
           ...prev,
           open: true,
@@ -210,6 +233,7 @@ const Dashboard: FC<any> = () => {
       <EditDialogComponent {...editDlgProps} />
       <PredictDialogComponent {...predictDlgProps} />
       <PredictResultDialogComponent {...predictResultDlgProps} />
+      <DeleteDialogComponent {...deleteDlgProps} />
 
       <div className={classes.dashboardCntr}>
         <div className={classes.dashboardTable}>
@@ -298,6 +322,7 @@ const Dashboard: FC<any> = () => {
                       <Button
                         variant="contained"
                         className={classes.controlButton}
+                        onClick={() => handleDeleteClick(model.modelName)}
                       >
                         Delete
                       </Button>
@@ -321,6 +346,12 @@ const Dashboard: FC<any> = () => {
           )}
         </div>
       </div>
+
+      {/* <Snackbar open={true} autoHideDuration={6000} onClose={() => {}}>
+        <Alert onClose={() => {}} severity="success" sx={{ width: '100%' }}>
+          This is a success message!
+        </Alert>
+      </Snackbar> */}
     </>
   );
 };
