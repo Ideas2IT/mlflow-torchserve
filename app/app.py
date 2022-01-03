@@ -59,7 +59,7 @@ def get_deployments(name):
         deploy = json.loads(result["deploy"])
     except Exception as err:
         deploy = str(err)
-    return json.dumps(deploy)
+    return json.dumps(deploy[0])
 
 
 @app.route('/create', methods=["POST"])
