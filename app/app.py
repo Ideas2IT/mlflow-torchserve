@@ -200,9 +200,14 @@ def predict():
     # return json.dumps(result)
 
 
-@app.route('/models', methods=["GET"])
-def models():
-    return True
+@app.route('/delete/<name>', methods=["POST"])
+def delete_deployment(name):
+    try:
+        result = plugin.delete_deployment(name)
+        result = {"status": "SUCCESS"}
+    except Exception as err:
+        result = str(err)
+    return json.dumps(result)
 
 if __name__ == '__main__':
     app.run(debug=False)
