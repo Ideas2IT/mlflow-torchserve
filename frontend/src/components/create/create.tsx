@@ -43,7 +43,7 @@ const useStyles = makeStyles((theme: any) =>
     },
     resetFileUpload: {
       paddingTop: "28px",
-      paddingLeft: "50px",
+      paddingLeft: "105px",
     },
     choiceOrOption: {
       padding: '32px 40px 0px 50px'

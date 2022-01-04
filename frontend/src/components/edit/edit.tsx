@@ -109,14 +109,14 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                     </div>
                 </div>
 
-                {/* <div>
+                 <div>
                     <div className={classes.otherFieldRow}>
-                        <div className={classes.fieldName}>Model File</div>
-                        <div className={classes.fieldContent}>{model.model_file}</div>
+                        <div className={classes.fieldName}>Model Version</div>
+                        <div className={classes.fieldContent}>{model.modelVersion}</div>
                     </div>
                 </div>
 
-                <div>
+                {/*<div>
                     <div className={classes.otherFieldRow}>
                         <div className={classes.fieldName}>Handler</div>
                         <div className={classes.fieldContent}>{model.handler_file}</div>

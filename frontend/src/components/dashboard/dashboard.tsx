@@ -334,7 +334,7 @@ const Dashboard: FC<any> = () => {
                     </div>
                   </div>
                 )) : <div className={classes.tableBodyRow}>
-                  No data found</div>}
+                  <span style={{margin: '0 auto'}}> No data found </span></div>}
               </div>
           {loading ? (
             <Backdrop
