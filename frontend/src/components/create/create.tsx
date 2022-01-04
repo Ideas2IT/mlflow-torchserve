@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme: any) =>
     },
     addFileUpload: {
       paddingTop: '28px',
-      paddingLeft: '283px'
+      paddingLeft: '105px'
     },
     resetFileUpload: {
       paddingTop: "28px",
@@ -313,6 +313,7 @@ const Create: FC<CreateComponentProps> = (
         <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
           <div>
             <div className={classes.fieldName}>Extra Files</div>
+            <div style={{maxWidth: '350px'}}>
             {extra_files.map((file: any, index: number) => (
               <Chip
                 label={file.name}
@@ -325,6 +326,7 @@ const Create: FC<CreateComponentProps> = (
                 }}
               />
             ))}
+            </div>
             {/* <TextField id="outlined-basic extra_files_name" 
                         className={classes.textField}
                         name="extra_files_name"
