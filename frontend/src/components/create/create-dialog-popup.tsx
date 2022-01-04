@@ -132,16 +132,14 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
       .then(
         (result) => {
           setLoading(false);
-          if (result.data && result.data.name) {
-            let [name, version] = result.data.name.split("/");
-            // setNewModal({
-            //   name,
-            //   version,
-            // });
+          if(result.data && result.data?.status === 'FAILURE' ) {
+            setSnackBar({showSnackbar: true, status: 'success', message: 'Model created Successfully !!'})
+          } else {
+            let [name, version] = result.data?.name?.split("/");
             props.newModal({ name, version });
+            setSnackBar({showSnackbar: true, status: 'success', message: 'Model created Successfully !!'})
+            handleClose();
           }
-          setSnackBar({showSnackbar: true, status: 'success', message: 'Model created Successfully !!'})
-          handleClose();
         },
         (error) => {
           setLoading(false);
