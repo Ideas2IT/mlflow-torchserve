@@ -4,7 +4,6 @@ import { createStyles, makeStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
 import Create from "./create";
@@ -36,10 +35,7 @@ const useStyles = makeStyles((theme: any) =>
       paddingBottom: "30px",
     },
     circle: {
-      color: 'white',
-      '&:hover': {
-        color: 'blue',
-      }
+      color: 'blue',
     },
   })
 );
@@ -64,10 +60,10 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
 ) => {
   const classes = useStyles();
   const { open, onCancelPressed = () => {} } = props;
-  const [newModal, setNewModal] = useState({
-    name: "",
-    version: "",
-  });
+  // const [newModal, setNewModal] = useState({
+  //   name: "",
+  //   version: "",
+  // });
   const defaultModelData = {
     model_name: "",
     target: "Torchserve 1",
@@ -138,10 +134,10 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
           setLoading(false);
           if (result.data && result.data.name) {
             let [name, version] = result.data.name.split("/");
-            setNewModal({
-              name,
-              version,
-            });
+            // setNewModal({
+            //   name,
+            //   version,
+            // });
             props.newModal({ name, version });
           }
           setSnackBar({showSnackbar: true, status: 'success', message: 'Model created Successfully !!'})
@@ -161,7 +157,6 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
   };
 
   const constructCreatePayload = (createObj: CreateDialogComponentProps) => {
-    console.log(createObj);
     const formData = new FormData();
     formData.append("model_name", createObj.model_name);
     formData.append("target", createObj.target);
@@ -185,7 +180,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
     );
     createObj.extra_files_list.length === 0
       ? formData.append("extra_file", createObj.extra_files)
-      : createObj.extra_files_list.map((file: any, index: number) => {
+      : createObj.extra_files_list.forEach((file: any, index: number) => {
           formData.append("extra_file_" + (index + 1), file);
         });
     return formData;
@@ -233,6 +228,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
           <Button
             variant="contained"
             className={classes.footerButton}
+            disabled={loading}
             onClick={handleSubmit}
             autoFocus
           >

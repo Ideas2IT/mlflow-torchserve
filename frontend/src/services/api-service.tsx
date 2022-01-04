@@ -1,5 +1,4 @@
 import axios from "axios";
-import { CreateDialogComponentProps } from "../components/create/create-dialog-popup";
 import { EditDialogComponentProps } from "../components/edit/edit-dialog-popup";
 import { ServerDialogComponentProps } from "../components/header/start-torch-server-dialog-popup";
 import { PredictDialogComponentProps } from "../components/predict/predict-dialog-popup";

@@ -6,11 +6,9 @@ import PredictDialogComponent, {
   PredictDialogComponentProps,
 } from "../predict/predict-dialog-popup";
 import PredictResultDialogComponent from "../predict/predict-result-dialog-popup";
-
-import { createStyles, makeStyles, StylesProvider } from "@mui/styles";
-import { Alert, AlertColor, Backdrop, Button, Chip, CircularProgress, Snackbar } from "@mui/material";
+import { createStyles, makeStyles } from "@mui/styles";
+import { AlertColor, Backdrop, Button, Chip, CircularProgress } from "@mui/material";
 import DeleteDialogComponent from "../delete/delete-dialog-popup";
-// constants
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -110,18 +108,6 @@ const Dashboard: FC<any> = () => {
           setloader(false);
         },
         (error) => {
-          setModels([
-            {
-              modelName: "mnist_classification",
-              modelUrl:
-                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/mnist_classification.mar",
-            },
-            {
-              modelName: "titanic",
-              modelUrl:
-                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/titanic.mar",
-            }
-          ]);
           setloader(false);
         }
       );
@@ -183,7 +169,6 @@ const Dashboard: FC<any> = () => {
   };
 
   const populateModal = (modal: any) => {
-    console.log(modal);
     getListServiceApiCall();
     // models.push({ modelName: modal.name, version: modal.verion });
   };

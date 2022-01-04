@@ -4,14 +4,12 @@ import { createStyles, makeStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
 import Edit from "./edit";
 import { DialogComponentProps } from "../dashboard/dashboard";
 import { editService, getService } from "../../services/api-service";
 import { Backdrop, CircularProgress } from "@mui/material";
-// import { createService } from "../../services/api-service";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({

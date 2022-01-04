@@ -4,13 +4,11 @@ import { createStyles, makeStyles } from '@mui/styles';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import CloseSharp from '@mui/icons-material/CloseSharp';
 import { DialogComponentProps, SnackBarComponentProps } from "../dashboard/dashboard";
-import { deleteService, editService, getService } from "../../services/api-service";
-import { Alert, AlertColor, Snackbar } from "@mui/material";
-// import { createService } from "../../services/api-service";
+import { deleteService } from "../../services/api-service";
+import { Alert, Snackbar } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({

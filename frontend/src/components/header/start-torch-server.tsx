@@ -1,10 +1,6 @@
-import React, { ReactElement, useState, FC, useEffect } from "react";
+import React, { ReactElement, FC } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
-
-// constants
-import { PAGE_TITLE_DASHBOARD } from "../../utils/constants";
-import { Button, Chip, FormControl, FormControlLabel, FormLabel, Grid, Radio, RadioGroup, TextareaAutosize, TextField } from "@mui/material";
-import { ClassNames } from "@emotion/react";
+import { Button, FormControlLabel, Radio, RadioGroup, TextField} from "@mui/material";
 import { FileUpload } from "../../shared/file-upload";
 import { ServerDialogComponentProps } from "./start-torch-server-dialog-popup";
 
@@ -15,9 +11,6 @@ const useStyles = makeStyles((theme: any) =>
     },
     otherRoot: {
       display: "flex",
-    },
-    otherRowPadding: {
-      // padding: "10px 0px",
     },
     fieldName: {
       paddingBottom: "8px",
@@ -81,7 +74,7 @@ const StartTorchServer: FC<StartTorchServerComponentProps> = (
           </RadioGroup>
         </div>
         {!model.files.model_store_path ? (
-          <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
+          <div className={classes.otherRoot}>
             <div>
               <TextField
                 id="outlined-basic model_store_path"
@@ -104,7 +97,7 @@ const StartTorchServer: FC<StartTorchServerComponentProps> = (
             </div>
           </div>
         ) : (
-          <div className={`${classes.otherRoot} ${classes.otherRowPadding}`}>
+          <div className={classes.otherRoot}>
             <div>
               <TextField
                 id="outlined-basic model_store_path"

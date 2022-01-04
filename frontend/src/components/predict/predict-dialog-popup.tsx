@@ -4,12 +4,11 @@ import { createStyles, makeStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
 import Predict from "./predict";
 import { DialogComponentProps } from "../dashboard/dashboard";
-import { getPredict, predictService } from "../../services/api-service";
+import { predictService } from "../../services/api-service";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({

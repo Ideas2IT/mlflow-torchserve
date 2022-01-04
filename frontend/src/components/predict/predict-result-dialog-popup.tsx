@@ -4,12 +4,9 @@ import { createStyles, makeStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
-import Predict from "./predict";
 import { DialogComponentProps } from "../dashboard/dashboard";
-import { getPredict } from "../../services/api-service";
 import PredictResult from "./predict-result";
 import { PredictDialogComponentProps } from "./predict-dialog-popup";
 

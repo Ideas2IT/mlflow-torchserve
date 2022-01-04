@@ -1,12 +1,7 @@
-import React, { ReactElement, useState, FC } from "react";
+import React, { ReactElement, FC } from "react";
 import { createStyles, makeStyles } from '@mui/styles';
-
-// constants
-import { PAGE_TITLE_DASHBOARD } from "../../utils/constants";
-import { Button, Grid, TextField } from "@mui/material";
-import { ClassNames } from "@emotion/react";
+import { TextField } from "@mui/material";
 import { EditDialogComponentProps } from "./edit-dialog-popup";
-import { FileUpload } from "../../shared/file-upload";
 import AddCircleOutlinedIcon from '@mui/icons-material/AddCircleOutlined';
 import RemoveCircleOutlinedIcon from '@mui/icons-material/RemoveCircleOutlined';
 
@@ -98,7 +93,7 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
 
                     <div className={classes.firstFieldRow}>
                         <div className={classes.fieldName}>Target</div>
-                        <div className={classes.fieldContent}>{model.target}</div>
+                        <div className={classes.fieldContent}>{model.target? model.target: 'Torchserve 1'}</div>
                     </div>
                 </div>
 

@@ -1,14 +1,7 @@
 import { FileUploader } from "react-drag-drop-files";
-import React, { ReactElement, useState, FC } from "react";
+import React, { ReactElement, FC } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
-
-// constants
-import { PAGE_TITLE_DASHBOARD } from "../../utils/constants";
-import { Button, Grid, TextField } from "@mui/material";
-import { ClassNames } from "@emotion/react";
 import { PredictDialogComponentProps } from "./predict-dialog-popup";
-import { FileUpload } from "../../shared/file-upload";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({

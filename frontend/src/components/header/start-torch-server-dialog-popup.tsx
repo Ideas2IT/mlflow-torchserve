@@ -4,12 +4,10 @@ import { createStyles, makeStyles } from "@mui/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
-import Create from "./start-torch-server";
 import { DialogComponentProps, SnackBarComponentProps } from "../dashboard/dashboard";
-import { createService, getDefaultConfigService, saveDefaultConfigService } from "../../services/api-service";
+import { getDefaultConfigService, saveDefaultConfigService } from "../../services/api-service";
 import StartTorchServer from "./start-torch-server";
 import { Alert, CircularProgress, Snackbar } from "@mui/material";
 
@@ -44,10 +42,7 @@ const useStyles = makeStyles((theme: any) =>
       paddingBottom: "30px",
     },
     circle: {
-      color: 'white',
-      '&:hover': {
-        color: 'blue',
-      }
+      color: 'blue',
     },
   })
 );
@@ -200,6 +195,7 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
         <DialogActions className={classes.footer}>
           <Button
             variant="contained"
+            disabled={defaultLoader}
             className={`${classes.footerButton} ${classes.footerSpace}`}
             onClick={() => saveDefaultConfig(modelState)}
           >
@@ -212,6 +208,7 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
           </Button>         */}
           <Button
             variant="contained"
+            disabled={loading}
             className={classes.footerButton}
             onClick={() => handleSubmit(modelState)}
             autoFocus

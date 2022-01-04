@@ -1,11 +1,8 @@
-import { FileUploader } from "react-drag-drop-files";
 import React, { ReactElement, useState, useEffect, FC } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import parse from 'html-react-parser';
-
-// constants
 import { PredictDialogComponentProps } from "./predict-dialog-popup";
-import { Button } from "@mui/material";
+import { Button, CircularProgress } from "@mui/material";
 import { explainService } from "../../services/api-service";
 
 const useStyles = makeStyles((theme: any) =>
@@ -30,6 +27,10 @@ const useStyles = makeStyles((theme: any) =>
     }, 
     explainTitle: {
       paddingBottom: '20px'
+    },
+    explainLoader: {
+      textAlign: 'center',
+      paddingTop: '125px'
     }
   })
 );
@@ -45,6 +46,7 @@ const PredictResult: FC<PredictResultComponentProps> = (
   const [openExplanation, setOpenExplanation] = useState<boolean>(false);
   const [openExplainImg, setOpenExplainImg] = useState<any>();
   const [openExplainHtml, setOpenExplainHtml] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
 
   const defaultModelData = {
     model_name: "",
@@ -61,11 +63,12 @@ const PredictResult: FC<PredictResultComponentProps> = (
     const formData = new FormData();
     formData.append("model_name", modelState.model_name);
     formData.append("model_inputPath", modelState.model_inputPath);
-
+    setLoading(true)
     explainService(formData)
       .then((res: any) => res.data)
       .then(
         (result) => {
+          setLoading(false)
           if (result.type === 'html') {
             setOpenExplainHtml(result.data)
           } else if (result.type === 'image') {
@@ -74,6 +77,7 @@ const PredictResult: FC<PredictResultComponentProps> = (
          
         },
         (error) => {
+          setLoading(false)
         }
       );
   }
@@ -98,6 +102,7 @@ const PredictResult: FC<PredictResultComponentProps> = (
             <span>
               <Button
               variant="contained"
+              disabled={loading}
               onClick={() => {
                 setOpenExplanation(true)
                 explainCall()
@@ -126,8 +131,13 @@ const PredictResult: FC<PredictResultComponentProps> = (
         <div>
           <div className={classes.explainTitle}><b>Explanation</b></div>
           <div className={classes.explain}>
-            {openExplainImg && <img className={classes.explain} src={`data:image/jpeg;base64,${openExplainImg}`} />}
+            { openExplainImg && <img className={classes.explain} src={`data:image/jpeg;base64,${openExplainImg}`} />}
             { openExplainHtml && parse(openExplainHtml) }
+            { loading && 
+              <div className={classes.explainLoader}>
+                <CircularProgress /> 
+              </div>
+            }
           </div>
         </div>
       </div>

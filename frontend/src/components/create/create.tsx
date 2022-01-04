@@ -1,10 +1,6 @@
 import React, { ReactElement, useState, FC, useEffect } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
-
-// constants
-import { PAGE_TITLE_DASHBOARD } from "../../utils/constants";
-import { Button, Chip, Grid, TextareaAutosize, TextField } from "@mui/material";
-import { ClassNames } from "@emotion/react";
+import { Button, Chip, TextField } from "@mui/material";
 import { CreateDialogComponentProps } from "./create-dialog-popup";
 import { FileUpload } from "../../shared/file-upload";
 
@@ -326,7 +322,6 @@ const Create: FC<CreateComponentProps> = (
                   files = files.filter((file: any, i: number) => index !== i);
                   setExtraFiles(files);
                   handleFileChange(files, 'extra_files');
-                  console.log(files);
                 }}
               />
             ))}
