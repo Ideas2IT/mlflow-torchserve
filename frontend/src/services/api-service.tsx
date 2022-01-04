@@ -67,3 +67,31 @@ export const deleteService = (model_name: string | undefined) => {
     },
   });
 };
+
+export const getDefaultConfigService = () => {
+  return fetch(`${BASE_URL}/default`);
+};
+
+export const saveDefaultConfigService = (postObj: ServerDialogComponentProps) => {
+  return fetch(`${BASE_URL}/save_settings`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(postObj),
+  });
+};
+
+export const getServerStatusService = () => {
+  return fetch(`${BASE_URL}/status`);
+};
+
+export const explainService = (postObj: any) => {
+  return fetch(`${BASE_URL}/explain`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(postObj),
+  });
+}

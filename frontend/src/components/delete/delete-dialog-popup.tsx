@@ -43,7 +43,8 @@ const DeleteDialogComponent: FC<DialogComponentProps> = (props: DialogComponentP
     const {
         open,
         onCancelPressed = ()=> {},
-        modelName
+        modelName,
+        listModel = () => {}
     } = props;
 
     const [openState, setOpenState] = useState<boolean>(open);
@@ -69,6 +70,7 @@ const DeleteDialogComponent: FC<DialogComponentProps> = (props: DialogComponentP
         (result) => {
           setSnackBar({showSnackbar: true, status: 'success', message: 'Model deleted Successfully !!'})
           handleClose();
+          listModel();
         },
         (error) => {
           setSnackBar({showSnackbar: true, status: 'error', message: 'Model deletion Failed !!'})

@@ -11,7 +11,7 @@ import CircleRoundedIcon from '@mui/icons-material/CircleRounded';
 import { PAGE_TITLE_DASHBOARD } from "../../utils/constants";
 import { DialogComponentProps } from "../dashboard/dashboard";
 import StartTorchServerDialogComponent from "./start-torch-server-dialog-popup";
-import { serverStatus } from "../../services/api-service";
+import { getServerStatusService, serverStatus } from "../../services/api-service";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -48,24 +48,41 @@ const useStyles = makeStyles((theme: any) =>
 const Header: FC<any> = ({ setStatus }): ReactElement => {
   const [serverStarted, setServerStatus] = React.useState(false);
   const [server, setServer] = React.useState("TorchServe_1");
+  const [loading, setLoading] = useState<boolean>(false);
   const classes = useStyles();
 
   useEffect(() => {
     setStatus(serverStarted);
   }, [serverStarted]);
 
+  useEffect(() => {
+    getServerStatusService()
+    .then((res: any) => res.data)
+    .then(
+      (result) => {
+        setStatus(true);
+        setServerStatus(true)
+      },
+      (error) => {
+        setStatus(false);
+        setServerStatus(false)
+      }
+    );
+  }, []);
+
   const serverStatusChange = (model: any, endpoint: string = 'start_torchserve') => {
-    console.log("model>>>>>>>>>>>>>>>>>>>>>>>>", model)
-    console.log("endpoint>>>>>>>>>>>>>>>>", endpoint)
+    setLoading(true);
     serverStatus(model, endpoint)
       .then((res) => res.json())
       .then(
         (result) => {
+          setLoading(false);
           if (result.status.toUpperCase() === "SUCCESS") {
             setServerStatus(!serverStarted);
           }
         },
         (error) => {
+          setLoading(false);
           setServerStatus(!serverStarted);
         }
       );
@@ -76,10 +93,8 @@ const Header: FC<any> = ({ setStatus }): ReactElement => {
     onCancelPressed: () => {
       setTorchServerDlgProps(torchServerDefaultDlgProps);
     },
-    onSubmitPressed: (model: any, setAsDefault: boolean) => {
-      if(!setAsDefault) {
-        serverStatusChange(model);
-      }
+    onSubmitPressed: (model: any) => {
+      serverStatusChange(model);
     }
   };
 
@@ -95,7 +110,7 @@ const Header: FC<any> = ({ setStatus }): ReactElement => {
 
   return (
     <>
-      <StartTorchServerDialogComponent {...torchServerDlgProps} />
+      <StartTorchServerDialogComponent {...torchServerDlgProps} loading={loading}/>
       
       <div className={classes.headerCntr}>
         <div className={classes.headerTitle}>{PAGE_TITLE_DASHBOARD}</div>

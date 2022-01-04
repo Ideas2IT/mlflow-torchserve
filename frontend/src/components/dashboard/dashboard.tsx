@@ -84,9 +84,11 @@ export interface DialogComponentProps {
   modelName?: string;
   newModal?: any;
   predictModel?: any;
+  loading?: any
   onCancelPressed?: () => void;
-  onSubmitPressed?: (model?: any, setAsDefault?: any) => void;
+  onSubmitPressed?: (model?: any) => void;
   onPreditAnotherPressed?: (modelName: string) => void;
+  listModel?: () => void;
 }
 
 export interface SnackBarComponentProps {
@@ -97,6 +99,33 @@ export interface SnackBarComponentProps {
 
 const Dashboard: FC<any> = () => {
   const classes = useStyles();
+
+  const getListServiceApiCall = () => {
+    setloader(true);
+    getListService()
+      .then((res) => res.json())
+      .then(
+        (result) => {
+          setModels(result);
+          setloader(false);
+        },
+        (error) => {
+          setModels([
+            {
+              modelName: "mnist_classification",
+              modelUrl:
+                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/mnist_classification.mar",
+            },
+            {
+              modelName: "titanic",
+              modelUrl:
+                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/titanic.mar",
+            }
+          ]);
+          setloader(false);
+        }
+      );
+  };
 
   const createDefaultDlgProps: DialogComponentProps = {
     open: false,
@@ -117,6 +146,7 @@ const Dashboard: FC<any> = () => {
   const deleteDefaultDlgProps: DialogComponentProps = {
     open: false,
     modelName: "",
+    listModel: getListServiceApiCall,
     onCancelPressed: () => {
       setDeleteDlgProps(editDefaultDlgProps);
     },
@@ -128,6 +158,10 @@ const Dashboard: FC<any> = () => {
       ...prev,
       open: true,
       modelName,
+      listModel: getListServiceApiCall,
+      onCancelPressed: () => {
+        setDeleteDlgProps(editDefaultDlgProps);
+      },
     }));
   };
 
@@ -192,33 +226,6 @@ const Dashboard: FC<any> = () => {
         }));
       },
     }));
-  };
-
-  const getListServiceApiCall = () => {
-    setloader(true);
-    getListService()
-      .then((res) => res.json())
-      .then(
-        (result) => {
-          setModels(result);
-          setloader(false);
-        },
-        (error) => {
-          setModels([
-            {
-              modelName: "mnist_classification",
-              modelUrl:
-                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/mnist_classification.mar",
-            },
-            {
-              modelName: "titanic",
-              modelUrl:
-                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/titanic.mar",
-            }
-          ]);
-          setloader(false);
-        }
-      );
   };
 
   const [loading, setloader] = useState(true);

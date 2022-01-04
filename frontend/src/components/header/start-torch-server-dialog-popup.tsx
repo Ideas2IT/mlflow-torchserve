@@ -8,10 +8,10 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseSharp from "@mui/icons-material/CloseSharp";
 import Create from "./start-torch-server";
-import { DialogComponentProps } from "../dashboard/dashboard";
-import { createService } from "../../services/api-service";
+import { DialogComponentProps, SnackBarComponentProps } from "../dashboard/dashboard";
+import { createService, getDefaultConfigService, saveDefaultConfigService } from "../../services/api-service";
 import StartTorchServer from "./start-torch-server";
-import { CircularProgress } from "@mui/material";
+import { Alert, CircularProgress, Snackbar } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -43,6 +43,12 @@ const useStyles = makeStyles((theme: any) =>
     dialogContent: {
       paddingBottom: "30px",
     },
+    circle: {
+      color: 'white',
+      '&:hover': {
+        color: 'blue',
+      }
+    },
   })
 );
 
@@ -65,7 +71,13 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
   props: DialogComponentProps
 ) => {
   const classes = useStyles();
-  const { open, onCancelPressed = () => {}, onSubmitPressed = (model: any, setAsDefault: boolean) => {}} = props;
+  const { 
+    open, 
+    loading,
+    onCancelPressed = () => {}, 
+    onSubmitPressed = (model: any) => {}
+  } = props;
+
   const defaultModelData = {
     // start_with_previous_model: true,
     // start_new_instance: false,
@@ -81,9 +93,29 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
     }
   };
   const [openState, setOpenState] = useState<boolean>(open);
+  const [defaultLoader, setDefaultLoader] = useState<boolean>(false);
   const [modelState, setModelState] =
     useState<ServerDialogComponentProps>(defaultModelData);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [snackBar, setSnackBar] = useState<SnackBarComponentProps>({showSnackbar: false});
+
+  useEffect(() => {
+    if(open) {
+      getDefaultConfigService()
+      .then((res: any) => res.data)
+      .then(
+        (result) => {
+          if(result && result?.model_store_choice) {
+            setModelState(result);
+          } else {
+            setModelState(defaultModelData);
+          }
+        },
+        (error) => {
+          setModelState(defaultModelData);
+        }
+      );
+    }
+  }, [open]);
 
   useEffect(() => {
     setOpenState(open);
@@ -112,58 +144,89 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
     }));
   };
 
-  const handleSubmit = (model: any, setAsDefault: boolean) => {
-    setLoading(true);
-    onSubmitPressed(model, setAsDefault)
-    setTimeout(() => setLoading(false), 3000); 
-    // onCancelPressed();
+  useEffect(() => {
+    if(!loading) {
+      onCancelPressed();
+    }
+  }, [loading]);
+
+  const handleSubmit = (model: any) => {
+    onSubmitPressed(model)
   };
 
+  const handleSnackBarClose = () => {
+    setSnackBar({showSnackbar: false});
+  };
+
+  const saveDefaultConfig = (model: any) => {
+    setDefaultLoader(true)
+    saveDefaultConfigService(model)
+      .then((res: any) => res.data)
+      .then(
+        (result) => {
+          setDefaultLoader(false)
+          setSnackBar({showSnackbar: true, status: 'success', message: 'Default Config Saved Successfully !!'})
+        },
+        (error) => {
+          // setTimeout(() => setDefaultLoader(false), 3000)
+          setDefaultLoader(false)
+          setSnackBar({showSnackbar: true, status: 'error', message: 'Default Config Failed to Save !!'})
+        }
+      );
+  }
+
   return (
-    <Dialog
-      maxWidth={"md"}
-      fullWidth={true}
-      open={openState}
-      onClose={handleClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      <DialogTitle className={classes.dialogTitle}>
-        <span>Torchserve Configuration</span>
-        <div className={classes.clearIcon} onClick={handleClose}>
-          <CloseSharp />
-        </div>
-      </DialogTitle>
-      <DialogContent dividers className={classes.dialogContent}>
-        <StartTorchServer
-          model={modelState}
-          handleChange={handleChange}
-          handleFileChange={handleFiles}
-        />
-      </DialogContent>
-      <DialogActions className={classes.footer}>
-        <Button
-          variant="contained"
-          className={`${classes.footerButton} ${classes.footerSpace}`}
-          onClick={() => handleSubmit(modelState, true)}
-        >
-          Save As Default
-        </Button>
-        {/* <Button variant="contained" onClick={onClick} disabled={loading}>
-          {loading && <CircularProgress size={14} />}
-          {!loading && 'Click Me'}
-        </Button>         */}
-        <Button
-          variant="contained"
-          className={classes.footerButton}
-          onClick={() => handleSubmit(modelState, false)}
-          autoFocus
-        >
-          {loading && <CircularProgress size={14} />}
-          {!loading && 'Start Torchserve'}  
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <>
+      <Dialog
+        maxWidth={"md"}
+        fullWidth={true}
+        open={openState}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle className={classes.dialogTitle}>
+          <span>Torchserve Configuration</span>
+          <div className={classes.clearIcon} onClick={handleClose}>
+            <CloseSharp />
+          </div>
+        </DialogTitle>
+        <DialogContent dividers className={classes.dialogContent}>
+          <StartTorchServer
+            model={modelState}
+            handleChange={handleChange}
+            handleFileChange={handleFiles}
+          />
+        </DialogContent>
+        <DialogActions className={classes.footer}>
+          <Button
+            variant="contained"
+            className={`${classes.footerButton} ${classes.footerSpace}`}
+            onClick={() => saveDefaultConfig(modelState)}
+          >
+            {defaultLoader && <CircularProgress className={classes.circle} size={20} />}
+            {!defaultLoader && 'Save As Default'}  
+          </Button>
+          {/* <Button variant="contained" onClick={onClick} disabled={loading}>
+            {loading && <CircularProgress size={14} />}
+            {!loading && 'Click Me'}
+          </Button>         */}
+          <Button
+            variant="contained"
+            className={classes.footerButton}
+            onClick={() => handleSubmit(modelState)}
+            autoFocus
+          >
+            {loading && <CircularProgress className={classes.circle} size={20} />}
+            {!loading && 'Start Torchserve'}  
+          </Button>
+        </DialogActions>
+      </Dialog>
+    
+      <Snackbar open={snackBar.showSnackbar} autoHideDuration={6000} onClose={handleSnackBarClose}>
+        {snackBar.status && <Alert severity={snackBar.status}> {snackBar.message} </Alert>}
+      </Snackbar> 
+    </>
   );
 };
 

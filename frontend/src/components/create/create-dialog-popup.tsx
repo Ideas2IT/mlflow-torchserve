@@ -10,7 +10,7 @@ import CloseSharp from "@mui/icons-material/CloseSharp";
 import Create from "./create";
 import { DialogComponentProps, SnackBarComponentProps } from "../dashboard/dashboard";
 import { createService } from "../../services/api-service";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, CircularProgress, Snackbar } from "@mui/material";
 
 const useStyles = makeStyles((theme: any) =>
   createStyles({
@@ -34,6 +34,12 @@ const useStyles = makeStyles((theme: any) =>
     },
     dialogContent: {
       paddingBottom: "30px",
+    },
+    circle: {
+      color: 'white',
+      '&:hover': {
+        color: 'blue',
+      }
     },
   })
 );
@@ -77,6 +83,7 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
     extra_files_list: [],
   };
   const [openState, setOpenState] = useState<boolean>(open);
+  const [loading, setLoading] = useState<boolean>(false);
   const [modelState, setModelState] =
     useState<CreateDialogComponentProps>(defaultModelData);
   const [snackBar, setSnackBar] = useState<SnackBarComponentProps>({showSnackbar: false});
@@ -123,10 +130,12 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
   };
 
   const handleSubmit = () => {
+    setLoading(true);
     createService(constructCreatePayload(modelState))
       .then((res) => res.data.json())
       .then(
         (result) => {
+          setLoading(false);
           if (result && result.name) {
             let [name, version] = result.name.split("/");
             setNewModal({
@@ -138,13 +147,14 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
           handleClose();
         },
         (error) => {
+          setLoading(false);
           setSnackBar({showSnackbar: true, status: 'error', message: 'Model creation Failed !!'})
           let result = { name: "titanic/8.0" };
           if (result && result.name) {
             let [name, version] = result.name.split("/");
             props.newModal({ name, version });
           }
-          handleClose();
+          // handleClose();
         }
       );
   };
@@ -211,13 +221,22 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
           >
             Cancel
           </Button>
-          <Button
+          {/* <Button
             variant="contained"
             className={classes.footerButton}
             onClick={handleSubmit}
             autoFocus
           >
             Create
+          </Button> */}
+          <Button
+            variant="contained"
+            className={classes.footerButton}
+            onClick={handleSubmit}
+            autoFocus
+          >
+            {loading && <CircularProgress className={classes.circle} size={20} />}
+            {!loading && 'Create'}
           </Button>
         </DialogActions>
       </Dialog> 
