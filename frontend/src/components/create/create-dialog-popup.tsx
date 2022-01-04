@@ -132,16 +132,17 @@ const CreateDialogComponent: FC<DialogComponentProps> = (
   const handleSubmit = () => {
     setLoading(true);
     createService(constructCreatePayload(modelState))
-      .then((res) => res.data.json())
+      .then((res) => res.data)
       .then(
         (result) => {
           setLoading(false);
-          if (result && result.name) {
-            let [name, version] = result.name.split("/");
+          if (result.data && result.data.name) {
+            let [name, version] = result.data.name.split("/");
             setNewModal({
               name,
               version,
             });
+            props.newModal({ name, version });
           }
           setSnackBar({showSnackbar: true, status: 'success', message: 'Model created Successfully !!'})
           handleClose();
