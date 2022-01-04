@@ -18,10 +18,10 @@ const useStyles = makeStyles((theme: any) =>
         paddingBottom: '5px'
     },
     firstRowPadding: {
-        padding: '5px 0px 10px 0px',
+        padding: '5px 10px 10px 0px',
         float: 'left',
         width: '60%',
-        borderRight: '1px solid rgba(0, 0, 0, 0.12)',
+        // borderRight: '1px solid rgba(0, 0, 0, 0.12)',
     },
     firstFieldRow: {
         position: 'relative',
@@ -50,7 +50,9 @@ const useStyles = makeStyles((theme: any) =>
     editContent: {
         float: 'right',
         width: '35%',
-        marginLeft: '10px'
+        marginLeft: '10px',
+        paddingLeft: '20px',
+        borderLeft: '1px solid rgba(0, 0, 0, 0.12)'
     },
     textField: {
         width: '35%'
@@ -91,7 +93,7 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                 <div className={classes.root}>
                     <div className={classes.firstFieldRow}>
                         <div className={classes.fieldName}>Model Name</div>
-                        <div className={classes.fieldContent}>{model.model_name}</div>
+                        <div className={classes.fieldContent}>{model.modelName}</div>
                     </div>
 
                     <div className={classes.firstFieldRow}>
@@ -103,11 +105,11 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                 <div>
                     <div className={classes.otherFieldRow}>
                         <div className={classes.fieldName}>Model URL</div>
-                        <div className={classes.fieldContent}>{model.model_url}</div>
+                        <div className={classes.fieldContent}>{model.modelUrl}</div>
                     </div>
                 </div>
 
-                <div>
+                {/* <div>
                     <div className={classes.otherFieldRow}>
                         <div className={classes.fieldName}>Model File</div>
                         <div className={classes.fieldContent}>{model.model_file}</div>
@@ -119,14 +121,14 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                         <div className={classes.fieldName}>Handler</div>
                         <div className={classes.fieldContent}>{model.handler_file}</div>
                     </div>
-                </div>
+                </div> */}
 
-                <div>
+                {/* <div>
                     <div className={classes.otherFieldRow}>
                         <div className={classes.fieldName}>Extra File</div>
                         <div className={classes.fieldContent}>{model.extra_files}</div>
                     </div>
-                </div>
+                </div> */}
 
             </div>
             <div className={classes.editContent}>
@@ -138,7 +140,7 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                         <TextField id="outlined-basic min_workers"
                             name="min_workers"
                             className={classes.textField}
-                            value={model.min_workers}
+                            value={model.minWorkers}
                             onChange={handleChange}
                             size="small"
                             variant="outlined" />
@@ -155,7 +157,7 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                         <TextField id="outlined-basic max_workers"
                             name="max_workers"
                             className={classes.textField}
-                            value={model.max_workers}
+                            value={model.maxWorkers}
                             onChange={handleChange}
                             size="small"
                             variant="outlined" />
@@ -172,7 +174,7 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                         <TextField id="outlined-basic batch_size"
                             name="batch_size"
                             className={classes.textField}
-                            value={model.batch_size}
+                            value={model.batchSize}
                             onChange={handleChange}
                             size="small"
                             variant="outlined" />
@@ -187,7 +189,7 @@ const Edit: FC<EditComponentProps> = (props: EditComponentProps): ReactElement =
                         <TextField id="outlined-basic max_batch_delay"
                             name="max_batch_delay"
                             className={classes.textField}
-                            value={model.max_batch_delay}
+                            value={model.maxBatchDelay}
                             onChange={handleChange}
                             size="small"
                             variant="outlined" />

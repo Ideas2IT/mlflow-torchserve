@@ -40,23 +40,25 @@ const useStyles = makeStyles((theme: any) =>
 );
 
 export interface EditDialogComponentProps {
-  model_name: string;
-  target: string;
-  model_url: string;
-  model_file: string;
-  handler_file: string;
-  extra_files: string;
-  export_files: string;
-  min_workers: number;
-  max_workers: number;
-  batch_size: number;
-  max_batch_delay: number;
-  files?: {
-    model_url: any;
-    model_file: any;
-    handler_file: any;
-    extra_files: any;
-  };
+  modelName: string;
+  target?: string;
+  modelUrl: string;
+  modelVersion: string;
+  runtime: string;
+  minWorkers: number;
+  maxWorkers: number;
+  batchSize: number;
+  maxBatchDelay: number;
+  loadedAtStartup: boolean;
+  workers?: [{
+    id: any;
+    startTime: any;
+    status: any;
+    memoryUsage: any;
+    pid: number;
+    gpu: boolean;
+    gpuUsage: string;
+  }];
 }
 
 const EditDialogComponent: FC<DialogComponentProps> = (
@@ -66,28 +68,21 @@ const EditDialogComponent: FC<DialogComponentProps> = (
   const { open, onCancelPressed = () => {}, modelName } = props;
 
   const defaultModelData = {
-    model_name: "",
-    target: "Torchserve 1",
-    model_url: "",
-    model_file: "",
-    handler_file: "",
-    extra_files: "",
-    export_files: "",
-    min_workers: 1,
-    max_workers: 1,
-    batch_size: 1,
-    max_batch_delay: 1,
-    files: {
-      model_url: null,
-      model_file: null,
-      handler_file: null,
-      extra_files: null,
-    },
-    extra_files_list: [],
+    modelName: "",
+    target: "TorchServe_1",
+    modelUrl: "",
+    modelVersion: "",
+    runtime: "",
+    minWorkers: 1,
+    maxWorkers: 1,
+    batchSize: 1,
+    loadedAtStartup: false,
+    maxBatchDelay: 1,
+    workers: null,
   };
   const [openState, setOpenState] = useState<boolean>(open);
   const [modelState, setModelState] =
-    useState<EditDialogComponentProps>(defaultModelData);
+    useState<any>(defaultModelData);
   const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     setOpenState(open);
@@ -101,33 +96,33 @@ const EditDialogComponent: FC<DialogComponentProps> = (
         .then(
           (result: any) => {
             setLoading(false);
-            setModelState(result.items);
+            setModelState(result);
           },
           (error: any) => {
             setLoading(false);
             setModelState({
-              model_name: "Titanic",
-              target: "Torchserve",
-              model_url:
-                "https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html",
-              model_file:
-                "https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html",
-              handler_file:
-                "https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html",
-              extra_files:
-                "https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html",
-              export_files:
-                "https://cceyda.github.io/blog/torchserve/streamlit/dashboard/2020/10/15/torchserve.html",
-              min_workers: 1,
-              max_workers: 1,
-              batch_size: 1,
-              max_batch_delay: 100,
-              files: {
-                model_url: null,
-                model_file: null,
-                handler_file: null,
-                extra_files: null,
-              },
+              modelName: "news_classification_test",
+              modelVersion: "1.0",
+              target: "Torchserve_1",
+              modelUrl:
+                "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/news_classification_test.mar",
+              runtime: "python",
+              minWorkers: 1,
+              maxWorkers: 1,
+              batchSize: 1,
+              maxBatchDelay: 100,
+              loadedAtStartup: false,
+              workers: [
+                {
+                  id: "9002",
+                  startTime: "2022-01-03T15:32:51.575Z",
+                  status: "READY",
+                  memoryUsage: 1639305216,
+                  pid: 12823,
+                  gpu: false,
+                  gpuUsage: "N/A",
+                },
+              ],
             });
           }
         );
@@ -167,9 +162,8 @@ const EditDialogComponent: FC<DialogComponentProps> = (
       );
   };
 
-  return (
-    !loading ? (
-      <Dialog
+  return !loading ? (
+    <Dialog
       maxWidth={"md"}
       fullWidth={true}
       open={openState}
@@ -184,11 +178,11 @@ const EditDialogComponent: FC<DialogComponentProps> = (
         </div>
       </DialogTitle>
       <DialogContent dividers className={classes.dialogContent}>
-         <Edit
-            model={modelState}
-            handleChange={handleChange}
-            handleVariation={handleVariation}
-          />
+        <Edit
+          model={modelState}
+          handleChange={handleChange}
+          handleVariation={handleVariation}
+        />
       </DialogContent>
       <DialogActions>
         <Button
@@ -208,14 +202,13 @@ const EditDialogComponent: FC<DialogComponentProps> = (
         </Button>
       </DialogActions>
     </Dialog>
-    ) : (
-      <Backdrop
-        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={loading}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>)
-    
+  ) : (
+    <Backdrop
+      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open={loading}
+    >
+      <CircularProgress color="inherit" />
+    </Backdrop>
   );
 };
 

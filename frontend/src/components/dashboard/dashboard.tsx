@@ -214,7 +214,7 @@ const Dashboard: FC<any> = () => {
               modelName: "titanic",
               modelUrl:
                 "/home/ubuntu/Documents/facebook/phase2/hackathon/mlflow-torchserve/app/model_store/titanic.mar",
-            },
+            }
           ]);
           setloader(false);
         }
@@ -242,8 +242,6 @@ const Dashboard: FC<any> = () => {
               New
             </Button>
           </div>
-          {models.length !== 0 ? (
-            <>
               <div className={classes.tableHeader}>
                 <div
                   className={[
@@ -271,7 +269,7 @@ const Dashboard: FC<any> = () => {
                 </div>
               </div>
               <div className={classes.tableBody}>
-                {models.map((model: any, index: number) => (
+                {models.length !== 0 ? models.map((model: any, index: number) => (
                   <div key={index} className={classes.tableBodyRow}>
                     <div
                       className={[
@@ -328,12 +326,9 @@ const Dashboard: FC<any> = () => {
                       </Button>
                     </div>
                   </div>
-                ))}
+                )) : <div className={classes.tableBodyRow}>
+                  No data found</div>}
               </div>
-            </>
-          ) : (
-            ""
-          )}
           {loading ? (
             <Backdrop
               sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
