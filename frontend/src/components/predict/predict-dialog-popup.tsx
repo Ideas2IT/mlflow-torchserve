@@ -79,10 +79,10 @@ const PredictDialogComponent: FC<DialogComponentProps> = (
     onCancelPressed();
   };
 
-  const handleFiles = (file: any) => {
+  const handleFiles = (file: any, isReset: boolean) => {
     setModelState({
       model_name: modelName ? modelName : "",
-      model_inputPath: file,
+      model_inputPath: !isReset? file: null,
     });
   };
 
