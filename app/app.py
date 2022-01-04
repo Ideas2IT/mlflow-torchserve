@@ -136,12 +136,15 @@ def async_run(command):
 
 @app.route('/start_torchserve', methods=["POST"])
 def start_torchserve():
-    start_cmd = "torchserve --start --ncs --model-store model_store"
+    os.environ["MKL_THREADING_LAYER"] = "GNU"
+    start_cmd = "torchserve --start --model-store model_store"
+    if json.loads(request.data.decode("utf-8"))["model_store_choice"] == "start_new_instance":
+        start_cmd += " --ncs"
     print("Starting torchserve")
     os.makedirs('model_store', exist_ok=True)
     t = Thread(target=async_run, args=(start_cmd,))
     t.start()
-
+    time.sleep(3)
     healthy = False
     for _ in range(10):
         print("Checking for health")
@@ -178,7 +181,7 @@ def stop_torchserve():
     return json.dumps(res)
 
 
-@app.route('/ping', methods=["GET"])
+@app.route('/status', methods=["GET"])
 def ping():
     failed = {'status': 'Failed', 'message': 'Not running...'}
     try:
@@ -238,11 +241,13 @@ def delete_deployment(name):
 
 @app.route('/default', methods=['GET'])
 def get_default_settings():
-    if not os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
-        return json.dumps([])
-    with open(DEFAULT_SETTINGS_FILE_PATH, 'r') as f:
-        return json.loads(f.read())
-
+    return {"data": "SUCCESS"}
+    # response = {}
+    # if not os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
+    #     return json.dumps({})
+    # with open(DEFAULT_SETTINGS_FILE_PATH, 'r') as f:
+    #     response["data"] = json.loads(f.read())
+    # return response
 
 @app.route('/save_settings', methods=['POST'])
 def save_default_settings():
@@ -256,38 +261,32 @@ def save_default_settings():
 
 @app.route('/explain', methods=['POST'])
 def explain():
-    # with open("./bert_explanation_output.json", "r") as fp:
-    #     explanations_json = json.load(fp)
-    # explanations_json = json.loads(explanations_json)
-    explanations_json = {'words': ['this', 'year', 'business', 'is', 'good'],
-                         'importances': [-0.8960579875054552,
-                                         0.32142482393688027,
-                                         0.03710019222888394,
-                                         0.16770534834823803,
-                                         0.2535047483910214],
-                         'delta': 0.021069901597269736}
-    attributions = explanations_json['importances']
-    tokens = explanations_json['words']
-    delta = explanations_json['delta']
+    response = {}
+    model_name = request.form.get("model_name")
+    saved_file_info = {}
+    files = request.files
+    upload_folder = tempfile.mkdtemp()
+    if files:
+        saved_file_info = save_files_to_disk(files, saved_file_info, upload_folder)
+        print(saved_file_info)
 
-    attributions = torch.tensor(attributions)
-    pred_prob = 0.75
-    pred_class = "Business"
-    true_class = "Business"
-    attr_class = "world"
+    try:
+        df = pd.read_json(saved_file_info["model_inputPath"])
+        explanations_json = plugin.explain(deployment_name=model_name, df=df)
+        response["status"] = "SUCCESS"
+        response["data"] = explanations_json
+        response["type"] = "html"
+    except Exception as e:
+        exc_info = sys.exc_info()
+        exception_string = ''.join(traceback.format_exception(*exc_info))
+        response["status"] = "FAILURE"
+        response["error"] = exception_string
 
-    vis_data_records = [visualization.VisualizationDataRecord(
-        attributions,
-        pred_prob,
-        pred_class,
-        true_class,
-        attr_class,
-        attributions.sum(),
-        tokens,
-        delta)]
+    finally:
+        if os.path.exists(upload_folder):
+            shutil.rmtree(upload_folder)
 
-    vis = visualization.visualize_text(vis_data_records)
-    return vis.data
+    return response
 
 
 if __name__ == '__main__':
