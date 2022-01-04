@@ -241,13 +241,12 @@ def delete_deployment(name):
 
 @app.route('/default', methods=['GET'])
 def get_default_settings():
-    return {"data": "SUCCESS"}
-    # response = {}
-    # if not os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
-    #     return json.dumps({})
-    # with open(DEFAULT_SETTINGS_FILE_PATH, 'r') as f:
-    #     response["data"] = json.loads(f.read())
-    # return response
+    response = {}
+    if not os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
+        return json.dumps({})
+    with open(DEFAULT_SETTINGS_FILE_PATH, 'r') as f:
+        response["data"] = json.loads(f.read())
+    return response
 
 @app.route('/save_settings', methods=['POST'])
 def save_default_settings():
