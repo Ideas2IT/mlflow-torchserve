@@ -64,7 +64,7 @@ const StartTorchServer: FC<StartTorchServerComponentProps> = (
 ): ReactElement => {
   const classes = useStyles();
   const { model, handleChange, handleFileChange } = props;
-  // console.log("model>>>>>>>>>>>>>>>>", model)
+  console.log("model>>>>>>>>>>>>>>>>", model)
 
   return (
     <div className={classes.root}>

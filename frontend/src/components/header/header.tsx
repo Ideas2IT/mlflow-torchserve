@@ -60,8 +60,13 @@ const Header: FC<any> = ({ setStatus }): ReactElement => {
     .then((res: any) => res.data)
     .then(
       (result) => {
-        setStatus(true);
-        setServerStatus(true)
+        if (result.status === 'Success') {
+          setStatus(true);
+          setServerStatus(true)
+        } else {
+          setStatus(false);
+          setServerStatus(false)
+        }
       },
       (error) => {
         setStatus(false);

@@ -311,12 +311,12 @@ const Dashboard: FC<any> = () => {
                       >
                         Predict
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="contained"
                         className={classes.controlButton}
                       >
                         Explain
-                      </Button>
+                      </Button> */}
                       <Button
                         className={classes.controlButton}
                         variant="contained"

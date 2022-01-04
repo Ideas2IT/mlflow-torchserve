@@ -104,8 +104,8 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
       .then((res: any) => res.data)
       .then(
         (result) => {
-          if(result && result?.model_store_choice) {
-            setModelState(result);
+          if(result.data && result.data?.model_store_choice) {
+            setModelState(result.data);
           } else {
             setModelState(defaultModelData);
           }
@@ -168,7 +168,6 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
           setSnackBar({showSnackbar: true, status: 'success', message: 'Default Config Saved Successfully !!'})
         },
         (error) => {
-          // setTimeout(() => setDefaultLoader(false), 3000)
           setDefaultLoader(false)
           setSnackBar({showSnackbar: true, status: 'error', message: 'Default Config Failed to Save !!'})
         }
