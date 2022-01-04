@@ -57,7 +57,7 @@ const Header: FC<any> = ({ setStatus }): ReactElement => {
 
   useEffect(() => {
     getServerStatusService()
-    .then((res: any) => res.data)
+    .then((res: any) => res.json())
     .then(
       (result) => {
         if (result.status === 'Success') {

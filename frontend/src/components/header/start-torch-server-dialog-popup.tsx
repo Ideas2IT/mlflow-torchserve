@@ -96,7 +96,7 @@ const StartTorchServerDialogComponent: FC<DialogComponentProps> = (
   useEffect(() => {
     if(open) {
       getDefaultConfigService()
-      .then((res: any) => res.data)
+      .then((res: any) => res.json())
       .then(
         (result) => {
           if(result.data && result.data?.model_store_choice) {
