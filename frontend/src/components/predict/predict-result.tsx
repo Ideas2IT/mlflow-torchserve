@@ -1,5 +1,5 @@
 import { FileUploader } from "react-drag-drop-files";
-import React, { ReactElement, useState, FC } from "react";
+import React, { ReactElement, useState, useEffect, FC } from "react";
 import { createStyles, makeStyles } from "@mui/styles";
 import parse from 'html-react-parser';
 
@@ -45,13 +45,24 @@ const PredictResult: FC<PredictResultComponentProps> = (
   const [openExplanation, setOpenExplanation] = useState<boolean>(false);
   const [openExplainImg, setOpenExplainImg] = useState<any>();
   const [openExplainHtml, setOpenExplainHtml] = useState<string>('');
+
+  const defaultModelData = {
+    model_name: "",
+    model_inputPath: null,
+  };
+  const [modelState, setModelState] = useState<PredictDialogComponentProps>(defaultModelData);
   const { model } = props;
 
+  useEffect(() => {
+    setModelState(model);
+  }, [model]);
+
   const explainCall = () => {
-    const explain = {
-      model: model?.model_inputPath
-    }
-    explainService(explain)
+    const formData = new FormData();
+    formData.append("model_name", modelState.model_name);
+    formData.append("model_inputPath", modelState.model_inputPath);
+
+    explainService(formData)
       .then((res: any) => res.data)
       .then(
         (result) => {
@@ -63,60 +74,21 @@ const PredictResult: FC<PredictResultComponentProps> = (
          
         },
         (error) => {
-        //   // setOpenExplainImg()
-        //   setOpenExplainHtml(`<table width: 100%>
-        //   <div style="border-top: 1px solid; margin-top: 5px;             padding-top: 5px; display: inline-block">
-        //     <b>Legend: </b><span style="display: inline-block; width: 10px; height: 10px;                 border: 1px solid; background-color:                 hsl(0, 75%, 60%)"></span>
-        //     Negative
-        //     <span style="display: inline-block; width: 10px; height: 10px;                 border: 1px solid; background-color:                 hsl(0, 75%, 100%)"></span>
-        //     Neutral
-        //     <span style="display: inline-block; width: 10px; height: 10px;                 border: 1px solid; background-color:                 hsl(120, 75%, 50%)"></span>
-        //     Positive </div>
-        //   <tr>
-        //     <th>True Label</th>
-        //     <th>Predicted Label</th>
-        //     <th>Attribution Label</th>
-        //     <th>Attribution Score</th>
-        //     <th>Word Importance</th>
-        //   <tr>
-        //     <td><text style="padding-right:2em"><b>Business</b></text></td>
-        //     <td><text style="padding-right:2em"><b>Business (0.75)</b></text></td>
-        //     <td><text style="padding-right:2em"><b>world</b></text></td>
-        //     <td><text style="padding-right:2em"><b>-0.12</b></text></td>
-        //     <td><mark style="background-color: hsl(0, 75%, 65%); opacity:1.0;                     line-height:1.75">
-        //         <font color="black"> this </font>
-        //       </mark><mark
-        //         style="background-color: hsl(120, 75%, 84%); opacity:1.0;                     line-height:1.75">
-        //         <font color="black"> year </font>
-        //       </mark><mark
-        //         style="background-color: hsl(120, 75%, 99%); opacity:1.0;                     line-height:1.75">
-        //         <font color="black"> business </font>
-        //       </mark><mark
-        //         style="background-color: hsl(120, 75%, 92%); opacity:1.0;                     line-height:1.75">
-        //         <font color="black"> is </font>
-        //       </mark><mark
-        //         style="background-color: hsl(120, 75%, 88%); opacity:1.0;                     line-height:1.75">
-        //         <font color="black"> good </font>
-        //       </mark></td>
-        //   <tr>
-        // </table>`)
         }
       );
   }
 
-  // console.log("model>>>>>>>>>>>>>>>>>>>>", model)
-
   return (
     <>
       <div>
-        <div className={classes.fields}><b>Model</b> : {"  " + model.model_name}</div>
-        <div className={classes.fileName}><b>File</b> : {"  " + model?.model_inputPath?.name}</div>
+        <div className={classes.fields}><b>Model</b> : {"  " + modelState.model_name}</div>
+        <div className={classes.fileName}><b>File</b> : {"  " + modelState?.model_inputPath?.name}</div>
         <div className={classes.fields}>
-            <span><b>Output</b> : {"  " + model.model_output?.data}</span>
+            <span><b>Output</b> : {"  " + modelState.model_output?.data}</span>
             <span className={classes.download}>
               <a
                 href={`data:text/json;charset=utf-8,${encodeURIComponent(
-                  JSON.stringify(model.model_output)
+                  JSON.stringify(modelState.model_output)
                 )}`}
                 download="model.json"
               >

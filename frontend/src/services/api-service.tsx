@@ -87,11 +87,9 @@ export const getServerStatusService = () => {
 };
 
 export const explainService = (postObj: any) => {
-  return fetch(`${BASE_URL}/explain`, {
+  return axios({
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(postObj),
+    url: `${BASE_URL}/explain`,
+    data: postObj
   });
 }
