@@ -10,20 +10,20 @@ import sys
 import traceback
 import shutil
 
+import torch
 from flask import Flask
-from flask import request
+from flask import request, render_template
+from captum.attr import visualization
+
 from file_utils import save_files_to_disk
-from constants import MODEL_FILE, MODEL_URL, HANDLER_FILE, EXTRA_FILES
-from flask import after_this_request
+from constants import MODEL_FILE, MODEL_URL, HANDLER_FILE, EXTRA_FILES, SETTINGS_FOLDER_PATH, \
+    DEFAULT_SETTINGS_FILE_PATH
 
 from flask_cors import CORS, cross_origin
-
 
 from mlflow.deployments import get_deploy_client
 
 plugin = get_deploy_client("torchserve")
-SETTINGS_FOLDER_PATH = 'settings'
-DEFAULT_SETTINGS_FILE_PATH = os.path.join(SETTINGS_FOLDER_PATH, 'default_settings.json')
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -86,7 +86,6 @@ def create_mt_deployment():
             saved_file_info.pop(key, None)
 
         saved_file_info[EXTRA_FILES] = extra_files_str
-
 
     if MODEL_FILE in request.form:
         saved_file_info[MODEL_FILE] = request.form.get(MODEL_FILE)
@@ -255,5 +254,41 @@ def save_default_settings():
     return json.dumps({'status': 'Success', 'message': 'Default settings saved...'})
 
 
+@app.route('/explain', methods=['POST'])
+def explain():
+    # with open("./bert_explanation_output.json", "r") as fp:
+    #     explanations_json = json.load(fp)
+    # explanations_json = json.loads(explanations_json)
+    explanations_json = {'words': ['this', 'year', 'business', 'is', 'good'],
+                         'importances': [-0.8960579875054552,
+                                         0.32142482393688027,
+                                         0.03710019222888394,
+                                         0.16770534834823803,
+                                         0.2535047483910214],
+                         'delta': 0.021069901597269736}
+    attributions = explanations_json['importances']
+    tokens = explanations_json['words']
+    delta = explanations_json['delta']
+
+    attributions = torch.tensor(attributions)
+    pred_prob = 0.75
+    pred_class = "Business"
+    true_class = "Business"
+    attr_class = "world"
+
+    vis_data_records = [visualization.VisualizationDataRecord(
+        attributions,
+        pred_prob,
+        pred_class,
+        true_class,
+        attr_class,
+        attributions.sum(),
+        tokens,
+        delta)]
+
+    vis = visualization.visualize_text(vis_data_records)
+    return vis.data
+
+
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)
