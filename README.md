@@ -27,6 +27,20 @@ python setup.py build
 python setup.py install
 ```
 
+###MLFlow Torchserve UI 
+To use MLFlow torchserve UI do the following steps
+* Start API server<br/>
+```
+cd app
+python app.py
+```
+* Start UI
+```
+cd frontend
+npm install
+npm start
+```
+
 ## What does it do
 Installing this package uses python's entrypoint mechanism to register the plugin into MLflow's
 plugin registry. This registry will be invoked each time you launch MLflow script or command line
@@ -50,6 +64,9 @@ plugin = get_deploy_client(target_uri)
 plugin.create_deployment(name=<deployment name>, model_uri=<model uri>, config={"MODEL_FILE": <model file path>, "HANDLER": <handler file path>})
 ```
 
+##### UI
+![Create Model](frontend/sample_snaps/create_model.png)
+
 ### Update deployment
 Update API can used to modify the configuration parameters such as number of workers, version etc., of an already deployed model.
 TorchServe will make sure the user experience is seamless while changing the model in a live environment.
@@ -63,6 +80,9 @@ mlflow deployments update -t torchserve --name <deployment name> -C "min-worker=
 ```python
 plugin.update_deployment(name=<deployment name>, config={'min-worker': <number of workers>})
 ```
+
+##### UI
+![Update deployment](frontend/sample_snaps/update_model_deployment.png)
 
 ### Delete deployment
 Delete an existing deployment. Excepton will be raised if the model is not already deployed.
@@ -90,6 +110,9 @@ mlflow deployments list -t torchserve
 plugin.list_deployments()
 ```
 
+##### UI
+![List models](frontend/sample_snaps/Dashboard.png)
+
 ### Get deployment details
 Get API fetches the details of the deployed model. By default, Get API fetches all the versions of the 
 deployed model.
@@ -103,6 +126,9 @@ mlflow deployments get -t torchserve --name <deployment name>
 ```python
 plugin.get_deployment(name=<deployment name>)
 ```
+
+##### UI
+![Model Details](frontend/sample_snaps/update_model_deployment.png)
 
 ### Run Prediction on deployed model
 Predict API enables to run prediction on the deployed model.
@@ -121,6 +147,23 @@ output-path is an optional parameter. Without output path parameter result will 
 ```python
 plugin.predict(name=<deployment name>, df=<prediction input>)
 ```
+
+##### UI
+![Predict](frontend/sample_snaps/predict.png)
+![Predict Results](frontend/sample_snaps/predict_result.png)
+
+### Run Explain on deployed model
+Explain API enables to get explanation on the deployed model.
+
+##### CLI
+```shell script
+mlflow deployments explain -t torchserve --name <deployment name> --input-path <input file path> --output-path <output file path>
+```
+
+output-path is an optional parameter. Without output path parameter result will be printed in console.
+
+##### UI
+![Explain](frontend/sample_snaps/explain.png)
 
 ### Plugin help
 Run the following command to get the plugin help string.
