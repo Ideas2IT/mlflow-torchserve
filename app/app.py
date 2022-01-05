@@ -11,10 +11,14 @@ from threading import Thread
 import matplotlib.pyplot as plt
 import pandas as pd
 import requests
-import torch
-from captum.attr import visualization
-from constants import MODEL_FILE, MODEL_URL, HANDLER_FILE, EXTRA_FILES, SETTINGS_FOLDER_PATH, \
-    DEFAULT_SETTINGS_FILE_PATH
+from constants import (
+    MODEL_FILE,
+    MODEL_URL,
+    HANDLER_FILE,
+    EXTRA_FILES,
+    SETTINGS_FOLDER_PATH,
+    DEFAULT_SETTINGS_FILE_PATH,
+)
 from file_utils import save_files_to_disk
 from flask import Flask
 from flask import request, render_template
@@ -26,10 +30,10 @@ plugin = get_deploy_client("torchserve")
 
 app = Flask(__name__)
 cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+app.config["CORS_HEADERS"] = "Content-Type"
 
 
-@app.route('/list', methods=["GET"])
+@app.route("/list", methods=["GET"])
 @cross_origin()
 def list_deployments():
     try:
@@ -39,7 +43,7 @@ def list_deployments():
     return json.dumps(result)
 
 
-@app.route('/listparse', methods=["GET"])
+@app.route("/listparse", methods=["GET"])
 @cross_origin()
 def list_parse_deployments():
     response = []
@@ -53,7 +57,7 @@ def list_parse_deployments():
     return json.dumps(response)
 
 
-@app.route('/models/<name>', methods=["GET"])
+@app.route("/models/<name>", methods=["GET"])
 def get_deployments(name):
     try:
         result = plugin.get_deployment(name)
@@ -63,7 +67,7 @@ def get_deployments(name):
     return json.dumps(deploy[0])
 
 
-@app.route('/create', methods=["POST"])
+@app.route("/create", methods=["POST"])
 def create_mt_deployment():
     saved_file_info = {}
     files = request.files
@@ -117,7 +121,7 @@ def create_mt_deployment():
         print(result)
     except Exception as e:
         exc_info = sys.exc_info()
-        exception_string = ''.join(traceback.format_exception(*exc_info))
+        exception_string = "".join(traceback.format_exception(*exc_info))
         response["status"] = "FAILURE"
         response["error"] = exception_string
 
@@ -133,14 +137,14 @@ def async_run(command):
     output.communicate()
 
 
-@app.route('/start_torchserve', methods=["POST"])
+@app.route("/start_torchserve", methods=["POST"])
 def start_torchserve():
     os.environ["MKL_THREADING_LAYER"] = "GNU"
     start_cmd = "torchserve --start --model-store model_store"
     if json.loads(request.data.decode("utf-8"))["model_store_choice"] == "start_new_instance":
         start_cmd += " --ncs"
     print("Starting torchserve")
-    os.makedirs('model_store', exist_ok=True)
+    os.makedirs("model_store", exist_ok=True)
     t = Thread(target=async_run, args=(start_cmd,))
     t.start()
     time.sleep(3)
@@ -163,36 +167,38 @@ def start_torchserve():
             time.sleep(10)
 
     if healthy:
-        res = {'status': 'Success', 'message': 'Started'}
+        res = {"status": "Success", "message": "Started"}
     else:
-        res = {'status': 'Failure', 'message': 'Error'}
+        res = {"status": "Failure", "message": "Error"}
 
     return json.dumps(res)
 
 
-@app.route('/stop_torchserve', methods=["POST"])
+@app.route("/stop_torchserve", methods=["POST"])
 def stop_torchserve():
     cmd = "torchserve --stop"
-    output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    res = {'status': 'Success', 'message': 'Starting...'}
-    if 'TorchServe has stopped.' not in output:
-        res = {'status': 'Success', 'message': str(output[0])}
+    output = subprocess.Popen(
+        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    ).communicate()
+    res = {"status": "Success", "message": "Starting..."}
+    if "TorchServe has stopped." not in output:
+        res = {"status": "Success", "message": str(output[0])}
     return json.dumps(res)
 
 
-@app.route('/status', methods=["GET"])
+@app.route("/status", methods=["GET"])
 def ping():
-    failed = {'status': 'Failed', 'message': 'Not running...'}
+    failed = {"status": "Failed", "message": "Not running..."}
     try:
-        res = requests.get('http://localhost:8080/ping')
+        res = requests.get("http://localhost:8080/ping")
         if res.status_code != 200:
             return json.dumps(failed)
     except requests.exceptions.ConnectionError:
         return json.dumps(failed)
-    return json.dumps({'status': 'Success', 'message': 'Running...'})
+    return json.dumps({"status": "Success", "message": "Running..."})
 
 
-@app.route('/predict', methods=["POST"])
+@app.route("/predict", methods=["POST"])
 def predict():
     response = {}
     model_name = request.form.get("model_name")
@@ -220,7 +226,7 @@ def predict():
         response["data"] = result
     except Exception as e:
         exc_info = sys.exc_info()
-        exception_string = ''.join(traceback.format_exception(*exc_info))
+        exception_string = "".join(traceback.format_exception(*exc_info))
         response["status"] = "FAILURE"
         response["error"] = exception_string
 
@@ -230,14 +236,8 @@ def predict():
 
     return response
 
-    # data = request.get_json()
-    # input_path = data["model_inputPath"]
-    # df = pd.read_json(input_path)
-    # result = plugin.predict(deployment_name=data["model_name"], df=df)
-    # return json.dumps(result)
 
-
-@app.route('/delete/<name>', methods=["POST"])
+@app.route("/delete/<name>", methods=["POST"])
 def delete_deployment(name):
     try:
         result = plugin.delete_deployment(name)
@@ -247,26 +247,27 @@ def delete_deployment(name):
     return json.dumps(result)
 
 
-@app.route('/default', methods=['GET'])
+@app.route("/default", methods=["GET"])
 def get_default_settings():
     response = {}
     if not os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
         return json.dumps({})
-    with open(DEFAULT_SETTINGS_FILE_PATH, 'r') as f:
+    with open(DEFAULT_SETTINGS_FILE_PATH, "r") as f:
         response["data"] = json.loads(f.read())
     return response
 
-@app.route('/save_settings', methods=['POST'])
+
+@app.route("/save_settings", methods=["POST"])
 def save_default_settings():
     if os.path.exists(DEFAULT_SETTINGS_FILE_PATH):
         os.remove(DEFAULT_SETTINGS_FILE_PATH)
     os.makedirs(SETTINGS_FOLDER_PATH, exist_ok=True)
-    with open(DEFAULT_SETTINGS_FILE_PATH, 'w') as f:
+    with open(DEFAULT_SETTINGS_FILE_PATH, "w") as f:
         f.write(json.dumps(request.json))
-    return json.dumps({'status': 'Success', 'message': 'Default settings saved...'})
+    return json.dumps({"status": "Success", "message": "Default settings saved..."})
 
 
-@app.route('/explain', methods=['POST'])
+@app.route("/explain", methods=["POST"])
 def explain():
     response = {}
     model_name = request.form.get("model_name")
@@ -285,7 +286,7 @@ def explain():
         response["type"] = "html"
     except Exception as e:
         exc_info = sys.exc_info()
-        exception_string = ''.join(traceback.format_exception(*exc_info))
+        exception_string = "".join(traceback.format_exception(*exc_info))
         response["status"] = "FAILURE"
         response["error"] = exception_string
 
@@ -296,5 +297,5 @@ def explain():
     return response
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=False)
