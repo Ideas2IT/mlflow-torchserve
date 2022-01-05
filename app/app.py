@@ -1,27 +1,26 @@
 import json
-import pandas as pd
 import os
-import requests
-import subprocess
-import time
-from threading import Thread
-import tempfile
-import sys
-import traceback
 import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import traceback
+from threading import Thread
 
+import matplotlib.pyplot as plt
+import pandas as pd
+import requests
 import torch
-from flask import Flask
-from flask import request, render_template
 from captum.attr import visualization
-
-from file_utils import save_files_to_disk
 from constants import MODEL_FILE, MODEL_URL, HANDLER_FILE, EXTRA_FILES, SETTINGS_FOLDER_PATH, \
     DEFAULT_SETTINGS_FILE_PATH
-
+from file_utils import save_files_to_disk
+from flask import Flask
+from flask import request, render_template
 from flask_cors import CORS, cross_origin
-
 from mlflow.deployments import get_deploy_client
+from torchvision import transforms
 
 plugin = get_deploy_client("torchserve")
 
@@ -205,7 +204,16 @@ def predict():
         print(saved_file_info)
 
     try:
-        df = pd.read_json(saved_file_info["model_inputPath"])
+        input_file_path = saved_file_info["model_inputPath"]
+        if ".json" in str(input_file_path).split("/")[-1]:
+            df = pd.read_json(saved_file_info["model_inputPath"])
+        else:
+            img = plt.imread(input_file_path)
+            image_transforms = transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
+            )
+
+            df = image_transforms(img)
         result = plugin.predict(deployment_name=model_name, df=df)
         print(result)
         response["status"] = "SUCCESS"
