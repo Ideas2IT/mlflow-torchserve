@@ -21,7 +21,7 @@ from constants import (
 )
 from file_utils import save_files_to_disk
 from flask import Flask
-from flask import request, render_template
+from flask import request
 from flask_cors import CORS, cross_origin
 from mlflow.deployments import get_deploy_client
 from torchvision import transforms
@@ -29,6 +29,8 @@ from torchvision import transforms
 plugin = get_deploy_client("torchserve")
 
 app = Flask(__name__)
+
+# TODO Not the best method to handle cors. To be removed with a fix.
 cors = CORS(app)
 app.config["CORS_HEADERS"] = "Content-Type"
 
@@ -99,8 +101,6 @@ def create_mt_deployment():
     if MODEL_URL in request.form:
         saved_file_info[MODEL_URL] = request.form.get(MODEL_URL)
 
-    print("Saved file info: ", saved_file_info)
-
     config = {
         MODEL_FILE: saved_file_info.get(MODEL_FILE),
         "HANDLER": saved_file_info.get(HANDLER_FILE),
@@ -118,7 +118,6 @@ def create_mt_deployment():
 
         response["status"] = "SUCCESS"
         response["data"] = result
-        print(result)
     except Exception as e:
         exc_info = sys.exc_info()
         exception_string = "".join(traceback.format_exception(*exc_info))
@@ -143,19 +142,16 @@ def start_torchserve():
     start_cmd = "torchserve --start --model-store model_store"
     if json.loads(request.data.decode("utf-8"))["model_store_choice"] == "start_new_instance":
         start_cmd += " --ncs"
-    print("Starting torchserve")
     os.makedirs("model_store", exist_ok=True)
     t = Thread(target=async_run, args=(start_cmd,))
     t.start()
     time.sleep(3)
     healthy = False
     for _ in range(10):
-        print("Checking for health")
         ping_data = {}
         try:
             # TODO Check ping status for any host
             ping_result = requests.get("http://localhost:8080/ping").text
-            print("Ping result")
             ping_data = json.loads(ping_result)
         except Exception as e:
             ping_data["status"] = "not ready"
@@ -163,7 +159,6 @@ def start_torchserve():
             healthy = True
             break
         else:
-            print("Not healthy .. retrying")
             time.sleep(10)
 
     if healthy:
@@ -207,7 +202,6 @@ def predict():
     upload_folder = tempfile.mkdtemp()
     if files:
         saved_file_info = save_files_to_disk(files, saved_file_info, upload_folder)
-        print(saved_file_info)
 
     try:
         input_file_path = saved_file_info["model_inputPath"]
@@ -221,7 +215,6 @@ def predict():
 
             df = image_transforms(img)
         result = plugin.predict(deployment_name=model_name, df=df)
-        print(result)
         response["status"] = "SUCCESS"
         response["data"] = result
     except Exception as e:
@@ -276,7 +269,6 @@ def explain():
     upload_folder = tempfile.mkdtemp()
     if files:
         saved_file_info = save_files_to_disk(files, saved_file_info, upload_folder)
-        print(saved_file_info)
 
     try:
         df = pd.read_json(saved_file_info["model_inputPath"])
