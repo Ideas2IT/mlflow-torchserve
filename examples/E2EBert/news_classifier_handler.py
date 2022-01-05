@@ -138,6 +138,8 @@ class NewsClassifierHandler(BaseHandler):
                 delta,
             )
         )
+        vis = visualization.visualize_text(vis_data_records)
+        return vis.data
 
     def score_func(self, o):
         output = F.softmax(o, dim=1)
@@ -193,7 +195,7 @@ class NewsClassifierHandler(BaseHandler):
         attributions_sum = self.summarize_attributions(attributions)
         feature_imp_dict["importances"] = attributions_sum.tolist()
         feature_imp_dict["delta"] = delta[0].tolist()
-        self.add_attributions_to_visualizer(
+        vis_data = self.add_attributions_to_visualizer(
             attributions, tokens, self.score_func(preds), out, 2, 1, delta, vis_data_records_base
         )
-        return [feature_imp_dict]
+        return [vis_data]

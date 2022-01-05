@@ -34,7 +34,8 @@ class IRISClassifierHandler(BaseHandler):
         data = json.loads(data[0]["data"].decode("utf-8"))
         df = pd.DataFrame(data)
 
-        _enforce_schema(df, self.mlmodel.get_input_schema())
+        if os.path.exists(self.mlmodel_file):
+            _enforce_schema(df, self.mlmodel.get_input_schema())
 
         input_tensor = torch.Tensor(list(df.iloc[0]))
         return input_tensor
@@ -68,9 +69,10 @@ class IRISClassifierHandler(BaseHandler):
         if os.path.exists(mapping_file_path):
             with open(mapping_file_path) as fp:
                 self.mapping = json.load(fp)
-        mlmodel_file = os.path.join(model_dir, "MLmodel")
+        self.mlmodel_file = os.path.join(model_dir, "MLmodel")
 
-        self.extract_signature(mlmodel_file=mlmodel_file)
+        if os.path.exists(self.mlmodel_file):
+            self.extract_signature(mlmodel_file=self.mlmodel_file)
 
         self.initialized = True
 
